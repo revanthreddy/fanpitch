@@ -39,3 +39,10 @@ yarn-error.log*
 
 # Vite
 .vite/
+
+# Firebase
+.firebase/
+
+# Python
+functions/venv/
+functions/__pycache__/
