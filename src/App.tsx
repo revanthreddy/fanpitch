@@ -1,24 +1,43 @@
 import { useState, useRef, useEffect } from 'react';
-import { Message } from './types';
+import { ChatMessage as ChatMessageType } from './types';
 import { useVertexAI } from './hooks/useVertexAI';
 import ChatMessage from './components/ChatMessage';
 import ChatInput from './components/ChatInput';
+import { useChatSimulation } from './hooks/useChatSimulation';
+
+const USER_SENDER = {
+  id: 'user',
+  name: 'You',
+  avatar: 'U',
+};
+
+const BOT_SENDER = {
+  id: 'gemini',
+  name: 'Gemini',
+  avatar: 'G',
+};
 
 function App() {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<ChatMessageType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { initialize, generateResponse, initialMessages } = useVertexAI();
+  const { initialize, generateResponse } = useVertexAI();
 
   useEffect(() => {
     initialize().catch(console.error);
   }, [initialize]);
 
+  const { messages: simulatedMessages, isSimulating } = useChatSimulation();
+
+  // Handle simulated messages
   useEffect(() => {
-    if (initialMessages.length > 0) {
-      setMessages(initialMessages);
-    }
-  }, [initialMessages]);
+    setMessages((prev) =>
+      [
+        ...prev.filter((msg) => msg.isUser || msg.isAI),
+        ...simulatedMessages,
+      ].sort((a, b) => a.timestamp - b.timestamp),
+    );
+  }, [simulatedMessages]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -28,21 +47,52 @@ function App() {
     setIsLoading(true);
     try {
       const response = await generateResponse(prompt);
-      setMessages((prev) => [...prev, { text: response, isUser: false }]);
+      const newMessage: ChatMessageType = {
+        id: Math.random().toString(),
+        text: response,
+        isAI: true,
+        timestamp: Date.now(),
+        sender: BOT_SENDER,
+      };
+      setMessages((prev) => [...prev, newMessage]);
     } catch (error) {
-      setMessages((prev) => [
-        ...prev,
-        { text: `Error: ${(error as Error).message}`, isUser: false },
-      ]);
+      const errorMessage: ChatMessageType = {
+        id: Math.random().toString(),
+        text: `Error: ${(error as Error).message}`,
+        isAI: true,
+        timestamp: Date.now(),
+        sender: BOT_SENDER,
+      };
+      setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleSubmit = async (text: string) => {
+  const handleSubmit = (text: string) => {
     if (!text.trim()) return;
 
-    setMessages((prev) => [...prev, { text, isUser: true }]);
+    const userMessage: ChatMessageType = {
+      id: Math.random().toString(),
+      text,
+      isUser: true,
+      timestamp: Date.now(),
+      sender: USER_SENDER,
+    };
+    setMessages((prev) => [...prev, userMessage]);
+  };
+
+  const handleAISubmit = async (text: string) => {
+    if (!text.trim()) return;
+
+    const userMessage: ChatMessageType = {
+      id: Math.random().toString(),
+      text,
+      isUser: true,
+      timestamp: Date.now(),
+      sender: USER_SENDER,
+    };
+    setMessages((prev) => [...prev, userMessage]);
     await handleGenerateResponse(text);
   };
 
@@ -54,7 +104,7 @@ function App() {
             <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-14v8l6-4z" />
             </svg>
-            Chat with Gemini
+            MLB Fantasy League Chat
           </h1>
         </div>
       </header>
@@ -64,10 +114,11 @@ function App() {
           <div className="flex flex-col space-y-4">
             {messages.map((message, index) => (
               <ChatMessage
-                key={index}
+                key={message.id}
                 {...message}
                 isSequential={
-                  index > 0 && messages[index - 1].isUser === message.isUser
+                  index > 0 &&
+                  messages[index - 1].sender.id === message.sender.id
                 }
               />
             ))}
@@ -75,6 +126,7 @@ function App() {
               <ChatMessage
                 text="Generating response..."
                 isUser={false}
+                sender={BOT_SENDER}
                 isSequential={
                   messages.length > 0 && !messages[messages.length - 1].isUser
                 }
@@ -84,7 +136,16 @@ function App() {
           <div ref={messagesEndRef} />
         </div>
 
-        <ChatInput onSubmit={handleSubmit} disabled={isLoading} />
+        <ChatInput
+          onSubmit={handleSubmit}
+          onAISubmit={handleAISubmit}
+          disabled={isLoading}
+          placeholder={
+            isSimulating
+              ? 'Join the conversation...'
+              : 'Type your message here...'
+          }
+        />
       </main>
     </div>
   );
