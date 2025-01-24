@@ -1,19 +1,15 @@
-export interface Message {
-  text: string;
-  isUser?: boolean;
-  isAI?: boolean;
-  isSequential?: boolean;
-}
-
 export interface Participant {
   id: string;
   name: string;
   avatar?: string;
+  isUser?: boolean;
+  isAI?: boolean;
 }
 
-export interface ChatMessage extends Message {
-  id: string;
+export interface ChatMessage {
+  id?: string;
   timestamp: number;
+  text: string;
   sender: Participant;
 }
 

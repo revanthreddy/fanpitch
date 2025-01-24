@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ChatMessage, Conversation } from '../types';
 import { mockConversation } from '../mocks/mockConversation';
 
@@ -9,7 +9,7 @@ export function useChatSimulation(
   const [isSimulating, setIsSimulating] = useState(false);
   const timeoutsRef = useRef<number[]>([]);
 
-  const simulateChat = useCallback(() => {
+  const simulateChat = () => {
     setIsSimulating(true);
     const now = Date.now();
 
@@ -24,16 +24,8 @@ export function useChatSimulation(
       if (delay > 0) {
         const timeoutId = window.setTimeout(() => {
           setMessages((prev) => {
-            // Find the last message's timestamp
-            const lastMessageTime =
-              prev.length > 0 ? prev[prev.length - 1].timestamp : 0;
-
-            // Only add the message if it's newer than the last message
-            // or if it's a user message (which we always want to keep)
-            if (message.timestamp > lastMessageTime || message.isUser) {
-              return [...prev, message];
-            }
-            return prev;
+            if (prev.find((msg) => msg.id === message.id)) return prev;
+            return [...prev, message];
           });
         }, delay);
         timeoutsRef.current.push(timeoutId);
@@ -46,7 +38,7 @@ export function useChatSimulation(
     }, conversation.endTime - now);
 
     timeoutsRef.current.push(endTimeoutId);
-  }, [conversation]);
+  };
 
   useEffect(() => {
     simulateChat();
@@ -58,7 +50,7 @@ export function useChatSimulation(
       //   setMessages([]);
       //   setIsSimulating(false);
     };
-  }, [simulateChat]);
+  }, []);
 
   return {
     messages,
