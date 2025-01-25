@@ -9,13 +9,14 @@ runtime="python312"
 region="us-central1"
 source_dir="./source/playgist_function"
 entry_point="handler"
+memory="1024MB"
 
 echo "Function Name: $function_name"
 echo "Runtime: $runtime"
 echo "Region: $region"
 echo "Source Directory: $source_dir"
 echo "Entry Point: $entry_point"
-
+echo "Memory: $memory"
 echo "Initiating deployment..."
 
 gcloud functions deploy "$function_name" \
@@ -25,7 +26,8 @@ gcloud functions deploy "$function_name" \
     --gen2 \
     --region="$region" \
     --source="$source_dir" \
-    --entry-point="$entry_point"
+    --entry-point="$entry_point" \
+    --memory="$memory"
 
 deployment_status=$?
 

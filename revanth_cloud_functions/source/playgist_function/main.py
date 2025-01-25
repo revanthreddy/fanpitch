@@ -1,52 +1,59 @@
 import functions_framework
 from google import genai
 from google.genai import types
+from vertexai.preview.generative_models import GenerativeModel, GenerationConfig
+from vertexai.preview import generative_models
+import vertexai
 
 
 def ask_vertex():
-    client = genai.Client(
-        vertexai=True,
-        project="ethereal-temple-448819-n0",
-        location="us-central1"
-    )
+    vertexai.init(project="ethereal-temple-448819-n0", location="us-central1")
 
-    model = "gemini-2.0-flash-exp"
-    contents = [
-        types.Content(
-            role="user",
-            parts=[
-                types.Part.from_text("""how are you""")
-            ]
-        )
-    ]
-    generate_content_config = types.GenerateContentConfig(
+    # Set up the model
+    model_name = "gemini-1.5-pro"  # Use the appropriate model name
+    model = GenerativeModel(model_name)
+
+    # Prepare the content
+    content = "how are yo"
+
+    # Configure generation settings
+    generation_config = GenerationConfig(
         temperature=1,
         top_p=0.95,
         max_output_tokens=8192,
-        response_modalities=["TEXT"],
-        safety_settings=[types.SafetySetting(
-            category="HARM_CATEGORY_HATE_SPEECH",
-            threshold="OFF"
-        ), types.SafetySetting(
-            category="HARM_CATEGORY_DANGEROUS_CONTENT",
-            threshold="OFF"
-        ), types.SafetySetting(
-            category="HARM_CATEGORY_SEXUALLY_EXPLICIT",
-            threshold="OFF"
-        ), types.SafetySetting(
-            category="HARM_CATEGORY_HARASSMENT",
-            threshold="OFF"
-        )],
-        system_instruction=[types.Part.from_text("""you are an mlb expert""")],
+        stop_sequences=None
     )
-    result = ""
-    for chunk in client.models.generate_content_stream(
-            model=model,
-            contents=contents,
-            config=generate_content_config,
-    ):
-      result = result + chunk
-    return "result"
+
+    # Set up safety settings
+    safety_settings = [
+        generative_models.SafetySetting(
+            category=generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+            threshold=generative_models.HarmBlockThreshold.BLOCK_NONE
+        ),
+        generative_models.SafetySetting(
+            category=generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+            threshold=generative_models.HarmBlockThreshold.BLOCK_NONE
+        ),
+        generative_models.SafetySetting(
+            category=generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+            threshold=generative_models.HarmBlockThreshold.BLOCK_NONE
+        ),
+        generative_models.SafetySetting(
+            category=generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT,
+            threshold=generative_models.HarmBlockThreshold.BLOCK_NONE
+        )
+    ]
+
+    # Generate content
+    try:
+        response = model.generate_content(
+            content,
+            generation_config=generation_config,
+            safety_settings=safety_settings
+        )
+        return ({"response" : response.text}, 200, {})
+    except Exception as e:
+        return ({"response" : e}, 500, {})
 
 
 @functions_framework.http
