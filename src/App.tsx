@@ -1,20 +1,22 @@
 import { useState, useRef, useEffect } from 'react';
-import { ChatMessage as ChatMessageType } from './types';
+import { ChatMessage as ChatMessageType, Participant } from './types';
 import { useVertexAI } from './hooks/useVertexAI';
 import ChatMessage from './components/ChatMessage';
 import ChatInput from './components/ChatInput';
 import { useChatSimulation } from './hooks/useChatSimulation';
 
-const USER_SENDER = {
+const USER_SENDER: Participant = {
   id: 'user',
   name: 'You',
   avatar: 'U',
+  isUser: true,
 };
 
-const BOT_SENDER = {
+const BOT_SENDER: Participant = {
   id: 'gemini',
   name: 'Gemini',
   avatar: 'G',
+  isAI: true,
 };
 
 function App() {
@@ -31,10 +33,13 @@ function App() {
 
   // Handle simulated messages
   useEffect(() => {
+    // FIXME Make this more efficient
     setMessages((prev) =>
       [
-        ...prev.filter((msg) => msg.isUser || msg.isAI),
-        ...simulatedMessages,
+        ...prev,
+        ...simulatedMessages.filter(
+          (msg) => !prev.some((p) => p.id === msg.id),
+        ),
       ].sort((a, b) => a.timestamp - b.timestamp),
     );
   }, [simulatedMessages]);
@@ -50,7 +55,6 @@ function App() {
       const newMessage: ChatMessageType = {
         id: Math.random().toString(),
         text: response,
-        isAI: true,
         timestamp: Date.now(),
         sender: BOT_SENDER,
       };
@@ -59,7 +63,6 @@ function App() {
       const errorMessage: ChatMessageType = {
         id: Math.random().toString(),
         text: `Error: ${(error as Error).message}`,
-        isAI: true,
         timestamp: Date.now(),
         sender: BOT_SENDER,
       };
@@ -75,7 +78,6 @@ function App() {
     const userMessage: ChatMessageType = {
       id: Math.random().toString(),
       text,
-      isUser: true,
       timestamp: Date.now(),
       sender: USER_SENDER,
     };
@@ -88,7 +90,6 @@ function App() {
     const userMessage: ChatMessageType = {
       id: Math.random().toString(),
       text,
-      isUser: true,
       timestamp: Date.now(),
       sender: USER_SENDER,
     };
@@ -124,11 +125,12 @@ function App() {
             ))}
             {isLoading && (
               <ChatMessage
+                timestamp={Date.now()}
                 text="Generating response..."
-                isUser={false}
                 sender={BOT_SENDER}
                 isSequential={
-                  messages.length > 0 && !messages[messages.length - 1].isUser
+                  messages.length > 0 &&
+                  !messages[messages.length - 1].sender.isUser
                 }
               />
             )}

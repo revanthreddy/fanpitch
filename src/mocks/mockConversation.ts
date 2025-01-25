@@ -13,7 +13,7 @@ export const mockConversation: Conversation = {
     { id: 'user1', name: 'Mike', avatar: '🎯' },
     { id: 'user2', name: 'Sarah', avatar: '⚾' },
     { id: 'user3', name: 'John', avatar: '🏆' },
-    { id: 'user4', name: 'Alex', avatar: '🔥' },
+    { id: 'user4', name: 'Alex', avatar: '🔥', isUser: true },
   ],
   messages: [
     {
@@ -37,7 +37,7 @@ export const mockConversation: Conversation = {
     {
       id: '4',
       text: "Guys, Cole's dealing too. This Yankees-Angels game is insane!",
-      sender: { id: 'user4', name: 'Alex', avatar: '🔥' },
+      sender: { id: 'user4', name: 'Alex', avatar: '🔥', isUser: true },
       timestamp: now + START_DELAY + 10000,
     },
     {
@@ -61,7 +61,7 @@ export const mockConversation: Conversation = {
     {
       id: '8',
       text: 'Well, there goes my pitching stats for the week 😭',
-      sender: { id: 'user4', name: 'Alex', avatar: '🔥' },
+      sender: { id: 'user4', name: 'Alex', avatar: '🔥', isUser: true },
       timestamp: now + START_DELAY + 25000,
     },
     {
