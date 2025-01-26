@@ -2,3 +2,6 @@ google-cloud-storage
 google-generativeai
 google-cloud-aiplatform
 google-genai
+google-cloud-bigquery==3.29.0
+google-api-core==2.24.0
+Flask-CORS
