@@ -1,5 +1,4 @@
-import { Conversation } from '../types';
-import { MLBDataForwarder, MLBForwardingResponse } from './MLBDataForwarder';
+import { getMockTime } from './dateUtils';
 
 interface MLBGamePlay {
   result: {
@@ -30,38 +29,40 @@ export class MLBStatsPoller {
   private static intervalId: number | null = null;
   private static initializationPromise: Promise<void> | null = null;
   private readonly pollInterval: number;
-  private readonly dataForwarder: MLBDataForwarder;
-  private readonly conversation: Conversation;
-  private readonly onUpdate: (response: MLBForwardingResponse) => void;
-  private lastPollTime: string;
+  private readonly endTime: number;
+  private readonly onUpdate: (response: MLBGameResponse) => void;
+  private lastPollTime: string | null = null;
   private availableTimestamps: string[] = [];
 
   private constructor(
     pollIntervalMs: number,
-    conversation: Conversation,
-    onUpdate: (response: MLBForwardingResponse) => void,
+    endTime: number,
+    onUpdate: (response: MLBGameResponse) => void,
   ) {
     this.pollInterval = pollIntervalMs;
-    this.conversation = conversation;
+    this.endTime = endTime;
     this.onUpdate = onUpdate;
-    this.dataForwarder = MLBDataForwarder.getInstance();
-    this.lastPollTime = '20230923_231815'; // Default value, will be updated in initialize()
     this.startPolling().catch(console.error);
   }
 
   public static getInstance(
-    pollIntervalMs: number = 30000,
-    conversation: Conversation,
-    onUpdate: (response: MLBForwardingResponse) => void,
+    pollIntervalMs: number = 10000,
+    endTime: number,
+    onUpdate: (response: MLBGameResponse) => void,
   ): MLBStatsPoller {
     if (!MLBStatsPoller.instance) {
       MLBStatsPoller.instance = new MLBStatsPoller(
         pollIntervalMs,
-        conversation,
+        endTime,
         onUpdate,
       );
     }
     return MLBStatsPoller.instance;
+  }
+
+  private shouldContinuePolling(): boolean {
+    const now = getMockTime();
+    return now < this.endTime;
   }
 
   private async fetchTimestamps(): Promise<string[]> {
@@ -79,7 +80,7 @@ export class MLBStatsPoller {
     timestamps: string[],
     currentTime: string,
   ): string {
-    // Find the largest timestamp that's less than or equal to current time
+    console.log('current time', currentTime);
     return timestamps.reduce((closest, timestamp) => {
       if (timestamp <= currentTime && timestamp > closest) {
         return timestamp;
@@ -89,7 +90,7 @@ export class MLBStatsPoller {
   }
 
   private getCurrentTimestamp(): string {
-    const now = new Date();
+    const now = new Date(getMockTime());
     return now
       .toISOString()
       .replace(/[^0-9]/g, '')
@@ -106,7 +107,6 @@ export class MLBStatsPoller {
       );
 
       if (!this.lastPollTime) {
-        // If no past timestamp found, use the earliest available
         this.lastPollTime = this.availableTimestamps[0];
       }
     } catch (error) {
@@ -116,7 +116,16 @@ export class MLBStatsPoller {
   }
 
   private async fetchMLBStats(): Promise<MLBGameResponse> {
+    this.lastPollTime = this.findClosestPastTimestamp(
+      this.availableTimestamps,
+      this.getCurrentTimestamp(),
+    );
+
+    console.log('current timecode', this.lastPollTime);
+
     const url = `https://statsapi.mlb.com/api/v1.1/game/${MLB_GAME_ID}/feed/live?timecode=${this.lastPollTime}&fields=liveData,plays,allPlays,result,description,event,eventType,isOut,about,startTime,endTime,isComplete`;
+
+    console.log('fetching url', url);
 
     const response = await fetch(url);
     if (!response.ok) {
@@ -125,17 +134,14 @@ export class MLBStatsPoller {
 
     const data = await response.json();
 
-    // Update the last poll time to the latest play's end time if available
     const plays = data.liveData?.plays?.allPlays || [];
     if (plays.length > 0) {
       const lastPlay = plays[plays.length - 1];
       if (lastPlay.about?.endTime) {
-        // Convert ISO date to required format (YYYYMMDD_HHMMSS)
         const newTimestamp = lastPlay.about.endTime
           .replace(/[^0-9]/g, '')
           .replace(/(\d{8})(\d{6})/, '$1_$2');
 
-        // Only update if the new timestamp exists in our available timestamps
         if (this.availableTimestamps.includes(newTimestamp)) {
           this.lastPollTime = newTimestamp;
         }
@@ -147,51 +153,44 @@ export class MLBStatsPoller {
 
   private async poll() {
     try {
+      if (!this.shouldContinuePolling()) {
+        console.log('Chat simulation ended, stopping MLB stats polling');
+        this.stopPolling();
+        return;
+      }
+
       console.log('Fetching MLB stats');
       const mlbData = await this.fetchMLBStats();
-      const response = await this.dataForwarder.forwardData(
-        mlbData,
-        this.conversation,
-      );
-      this.onUpdate(response);
+      this.onUpdate(mlbData);
     } catch (error) {
       console.error('Error during polling:', error);
     }
   }
 
   private async startPolling(): Promise<void> {
-    // If there's an existing initialization in progress, wait for it
     if (MLBStatsPoller.initializationPromise) {
       await MLBStatsPoller.initializationPromise;
       return;
     }
 
-    // If polling is already running (after initialization), return
     if (MLBStatsPoller.intervalId !== null) {
       return;
     }
 
-    // Create and store the initialization promise
     MLBStatsPoller.initializationPromise = (async () => {
       try {
         await this.initialize();
-
-        // Initial poll
         await this.poll();
-
-        // Start periodic polling
         MLBStatsPoller.intervalId = window.setInterval(
           () => this.poll(),
           this.pollInterval,
         );
       } catch (error) {
-        // Clear the initialization promise on failure
         MLBStatsPoller.initializationPromise = null;
         throw error;
       }
     })();
 
-    // Wait for initialization to complete
     await MLBStatsPoller.initializationPromise;
   }
 

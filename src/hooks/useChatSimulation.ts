@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { ChatMessage, Conversation } from '../types';
 import { mockConversation } from '../mocks/mockConversation';
+import { getMockTime } from '../utils/dateUtils';
 
 export function useChatSimulation(
   conversation: Conversation = mockConversation,
@@ -11,7 +12,7 @@ export function useChatSimulation(
 
   const simulateChat = () => {
     setIsSimulating(true);
-    const now = Date.now();
+    const now = getMockTime();
 
     // Clear any existing timeouts
     timeoutsRef.current.forEach(clearTimeout);
@@ -25,10 +26,16 @@ export function useChatSimulation(
         const timeoutId = window.setTimeout(() => {
           setMessages((prev) => {
             if (prev.find((msg) => msg.id === message.id)) return prev;
+            console.log('adding message', message.timestamp);
             return [...prev, message];
           });
         }, delay);
         timeoutsRef.current.push(timeoutId);
+      } else {
+        setMessages((prev) => {
+          if (prev.find((msg) => msg.id === message.id)) return prev;
+          return [...prev, message];
+        });
       }
     });
 

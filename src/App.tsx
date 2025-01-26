@@ -1,12 +1,16 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { ChatMessage as ChatMessageType, Participant } from './types';
 import { useVertexAI } from './hooks/useVertexAI';
 import ChatMessage from './components/ChatMessage';
 import ChatInput from './components/ChatInput';
 import { useChatSimulation } from './hooks/useChatSimulation';
-import { MLBStatsPoller } from './utils/MLBStatsPoller';
-import { MLBForwardingResponse } from './utils/MLBDataForwarder';
+import { MLBStatsPoller, MLBGameResponse } from './utils/MLBStatsPoller';
+import {
+  MLBDataForwarder,
+  MLBForwardingResponse,
+} from './utils/MLBDataForwarder';
 import { mockConversation } from './mocks/mockConversation';
+import { getMockTime } from './utils/dateUtils';
 
 const USER_SENDER: Participant = {
   id: 'user',
@@ -23,49 +27,70 @@ const BOT_SENDER: Participant = {
 };
 
 // MLB Stats Poller configuration
-const MLB_POLL_INTERVAL = 30000; // 30 seconds
+const MLB_POLL_INTERVAL = 15000;
 
 function App() {
   const [messages, setMessages] = useState<ChatMessageType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesRef = useRef<ChatMessageType[]>([]);
   const { initialize, generateResponse } = useVertexAI();
+  const mlbDataForwarder = useRef(MLBDataForwarder.getInstance());
+  const mlbPoller = useRef<MLBStatsPoller | null>(null);
+
+  // Keep messagesRef in sync with messages state
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
 
   useEffect(() => {
     initialize().catch(console.error);
   }, [initialize]);
 
-  const handleMLBUpdate = (response: MLBForwardingResponse) => {
-    if (!response.summary) return;
+  const handleMLBUpdate = useCallback(async (mlbData: MLBGameResponse) => {
+    try {
+      console.log('Current messages length:', messagesRef.current.length);
+      const response: MLBForwardingResponse =
+        await mlbDataForwarder.current.forwardData(mlbData, {
+          ...mockConversation,
+          messages: messagesRef.current.filter(
+            (msg) => msg.timestamp <= getMockTime(),
+          ),
+        });
 
-    const newMessage: ChatMessageType = {
-      id: Math.random().toString(),
-      text: response.summary,
-      timestamp: Date.now(),
-      sender: BOT_SENDER,
-    };
+      if (!response.summary) return;
 
-    setMessages((prev) => [...prev, newMessage]);
-  };
+      const newMessage: ChatMessageType = {
+        id: Math.random().toString(),
+        text: response.summary,
+        timestamp: getMockTime(),
+        sender: BOT_SENDER,
+      };
+
+      setMessages((prev) => [...prev, newMessage]);
+    } catch (error) {
+      console.error('Error handling MLB update:', error);
+    }
+  }, []); // No dependencies needed since we use refs
 
   // Initialize MLB Stats Poller
   useEffect(() => {
-    const mlbPoller = MLBStatsPoller.getInstance(
+    mlbPoller.current = MLBStatsPoller.getInstance(
       MLB_POLL_INTERVAL,
-      mockConversation,
+      mockConversation.endTime,
       handleMLBUpdate,
     );
 
     return () => {
-      mlbPoller.stopPolling();
+      mlbPoller.current?.stopPolling();
     };
   }, []);
 
+  // Use simulated messages
   const { messages: simulatedMessages, isSimulating } = useChatSimulation();
 
   // Handle simulated messages
   useEffect(() => {
-    // FIXME Make this more efficient
     setMessages((prev) =>
       [
         ...prev,
@@ -87,7 +112,7 @@ function App() {
       const newMessage: ChatMessageType = {
         id: Math.random().toString(),
         text: response,
-        timestamp: Date.now(),
+        timestamp: getMockTime(),
         sender: BOT_SENDER,
       };
       setMessages((prev) => [...prev, newMessage]);
@@ -95,7 +120,7 @@ function App() {
       const errorMessage: ChatMessageType = {
         id: Math.random().toString(),
         text: `Error: ${(error as Error).message}`,
-        timestamp: Date.now(),
+        timestamp: getMockTime(),
         sender: BOT_SENDER,
       };
       setMessages((prev) => [...prev, errorMessage]);
@@ -110,7 +135,7 @@ function App() {
     const userMessage: ChatMessageType = {
       id: Math.random().toString(),
       text,
-      timestamp: Date.now(),
+      timestamp: getMockTime(),
       sender: USER_SENDER,
     };
     setMessages((prev) => [...prev, userMessage]);
@@ -122,7 +147,7 @@ function App() {
     const userMessage: ChatMessageType = {
       id: Math.random().toString(),
       text,
-      timestamp: Date.now(),
+      timestamp: getMockTime(),
       sender: USER_SENDER,
     };
     setMessages((prev) => [...prev, userMessage]);
@@ -157,7 +182,7 @@ function App() {
             ))}
             {isLoading && (
               <ChatMessage
-                timestamp={Date.now()}
+                timestamp={getMockTime()}
                 text="Generating response..."
                 sender={BOT_SENDER}
                 isSequential={

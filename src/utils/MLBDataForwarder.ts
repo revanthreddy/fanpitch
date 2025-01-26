@@ -1,4 +1,5 @@
 import { Conversation } from '../types';
+import { getMockTime } from './dateUtils';
 import { MLBGameResponse } from './MLBStatsPoller';
 
 const MLB_FORWARDING_ENDPOINT =
@@ -23,7 +24,7 @@ export class MLBDataForwarder {
   }
 
   private getFilteredConversation(conversation: Conversation): Conversation {
-    const currentTime = Date.now();
+    const currentTime = getMockTime();
     return {
       ...conversation,
       messages: conversation.messages.filter(
