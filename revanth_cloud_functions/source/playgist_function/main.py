@@ -2,8 +2,10 @@ import functions_framework
 from flask import make_response, jsonify
 from flask_cors import CORS, cross_origin
 from vertex_ai_utils import summarize_player_homerun_insights
+from vertex_ai_utils import translate_text
 from urllib.parse import unquote
 from config import ALLOWED_LANGUAGES
+
 
 @functions_framework.http
 def handler(request):
@@ -49,12 +51,12 @@ def handler(request):
 
         # Process the text and translate_to fields here
         # For this example, we'll just return them in a response
-        response = {
-            "original_text": text,
-            "translated_to": translate_to,
-            "translated_text": f"Translated '{text}' to {translate_to}"
-        }
-
+        # response = {
+        #     "original_text": text,
+        #     "translated_to": translate_to,
+        #     "translated_text": f"Translated '{text}' to {translate_to}"
+        # }
+        response, status_code = translate_text(object_to_translate={"text": text, "translate_to": translate_to})
         return make_response(jsonify(response), 200, headers)
 
     elif request.method == 'POST' and request.path == '/summarize':
