@@ -4,6 +4,9 @@ import { useVertexAI } from './hooks/useVertexAI';
 import ChatMessage from './components/ChatMessage';
 import ChatInput from './components/ChatInput';
 import { useChatSimulation } from './hooks/useChatSimulation';
+import { MLBStatsPoller } from './utils/MLBStatsPoller';
+import { MLBForwardingResponse } from './utils/MLBDataForwarder';
+import { mockConversation } from './mocks/mockConversation';
 
 const USER_SENDER: Participant = {
   id: 'user',
@@ -13,11 +16,14 @@ const USER_SENDER: Participant = {
 };
 
 const BOT_SENDER: Participant = {
-  id: 'gemini',
-  name: 'Gemini',
-  avatar: 'G',
+  id: 'mlb-bot',
+  name: 'MLB Bot',
+  avatar: '⚾',
   isAI: true,
 };
+
+// MLB Stats Poller configuration
+const MLB_POLL_INTERVAL = 30000; // 30 seconds
 
 function App() {
   const [messages, setMessages] = useState<ChatMessageType[]>([]);
@@ -28,6 +34,32 @@ function App() {
   useEffect(() => {
     initialize().catch(console.error);
   }, [initialize]);
+
+  const handleMLBUpdate = (response: MLBForwardingResponse) => {
+    if (!response.summary) return;
+
+    const newMessage: ChatMessageType = {
+      id: Math.random().toString(),
+      text: response.summary,
+      timestamp: Date.now(),
+      sender: BOT_SENDER,
+    };
+
+    setMessages((prev) => [...prev, newMessage]);
+  };
+
+  // Initialize MLB Stats Poller
+  useEffect(() => {
+    const mlbPoller = MLBStatsPoller.getInstance(
+      MLB_POLL_INTERVAL,
+      mockConversation,
+      handleMLBUpdate,
+    );
+
+    return () => {
+      mlbPoller.stopPolling();
+    };
+  }, []);
 
   const { messages: simulatedMessages, isSimulating } = useChatSimulation();
 

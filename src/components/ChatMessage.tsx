@@ -1,11 +1,21 @@
 import { ChatMessage as ChatMessageType } from '../types';
 import clsx from 'clsx';
+import AIBanner from './AIBanner';
 
-interface ChatMessageProps extends ChatMessageType {
+export interface ChatMessageProps extends ChatMessageType {
   isSequential?: boolean;
 }
 
-const ChatMessage = ({ text, isSequential, sender }: ChatMessageProps) => {
+const ChatMessage = ({
+  timestamp,
+  text,
+  isSequential,
+  sender,
+}: ChatMessageProps) => {
+  if (sender.isAI) {
+    return <AIBanner timestamp={timestamp} text={text} sender={sender} />;
+  }
+
   return (
     <div
       className={clsx(

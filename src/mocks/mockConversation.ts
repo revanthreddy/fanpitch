@@ -14,6 +14,7 @@ export const mockConversation: Conversation = {
     { id: 'user2', name: 'Sarah', avatar: '⚾' },
     { id: 'user3', name: 'John', avatar: '🏆' },
     { id: 'user4', name: 'Alex', avatar: '🔥', isUser: true },
+    { id: 'user5', name: 'BOT', avatar: '🤖', isAI: true },
   ],
   messages: [
     {
@@ -48,27 +49,39 @@ export const mockConversation: Conversation = {
     },
     {
       id: '6',
-      text: "My week depends on this at-bat! I'm only up by 2 points 😰",
-      sender: { id: 'user2', name: 'Sarah', avatar: '⚾' },
+      text: 'Did you know that Trout is the only player in MLB history to have 300+ HRs, 300+ SB, and 300+ SB in the same season? 🤯',
+      sender: { id: 'user5', name: 'BOT', avatar: '🤖', isAI: true },
       timestamp: now + START_DELAY + 18000,
     },
     {
       id: '7',
-      text: 'GRAND SLAM! TROUT YOU BEAUTIFUL MAN! 🎉',
-      sender: { id: 'user3', name: 'John', avatar: '🏆' },
-      timestamp: now + START_DELAY + 22000,
+      text: "My week depends on this at-bat! I'm only up by 2 points 😰",
+      sender: { id: 'user2', name: 'Sarah', avatar: '⚾' },
+      timestamp: now + START_DELAY + 21000,
     },
     {
       id: '8',
-      text: 'Well, there goes my pitching stats for the week 😭',
-      sender: { id: 'user4', name: 'Alex', avatar: '🔥', isUser: true },
-      timestamp: now + START_DELAY + 25000,
+      text: 'GRAND SLAM! TROUT YOU BEAUTIFUL MAN! 🎉',
+      sender: { id: 'user3', name: 'John', avatar: '🏆' },
+      timestamp: now + START_DELAY + 24000,
     },
     {
       id: '9',
+      text: 'Well, there goes my pitching stats for the week 😭',
+      sender: { id: 'user4', name: 'Alex', avatar: '🔥', isUser: true },
+      timestamp: now + START_DELAY + 27000,
+    },
+    {
+      id: '10',
+      text: "Ohtani's pitching stats are: 1-0, 0.00 ERA, 10 Ks, 0 BBs, 0 HRs, 0.00 WHIP, 0.00 FIP, 0.00 xFIP, 0.00 K/BB, 0.00 K/9, 0.00 BB/9, 0.00 HR/9, 0.00 H/9, 0.00 HR/FB, 0.00 K/FB, 0.00 K%",
+      sender: { id: 'user5', name: 'BOT', avatar: '🤖', isAI: true },
+      timestamp: now + START_DELAY + 30000,
+    },
+    {
+      id: '11',
       text: "That's baseball for ya! Anyone watching the Dodgers game? Betts is heating up 👀",
       sender: { id: 'user1', name: 'Mike', avatar: '🎯' },
-      timestamp: now + START_DELAY + 28000,
+      timestamp: now + START_DELAY + 33000,
     },
   ],
 };

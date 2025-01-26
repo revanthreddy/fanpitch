@@ -5,25 +5,38 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#2196f3',
-          dark: '#1976d2',
+          DEFAULT: '#1e3a8a', // MLB navy blue
+          dark: '#172554',
         },
         chat: {
           user: {
-            bg: '#e3f2fd',
-            text: '#1565c0',
+            bg: '#eff6ff', // Light blue background
+            text: '#1e3a8a', // MLB navy blue
           },
           bot: {
-            bg: '#f5f5f5',
-            text: '#333333',
+            bg: '#f8fafc', // Light gray background
+            text: '#334155', // Slate text
+          },
+          ai: {
+            border: {
+              from: '#dc2626', // Baseball red
+              via: '#1d4ed8', // Baseball blue
+              to: '#dc2626', // Baseball red
+            },
+            accent: '#dc2626', // Baseball red for stitching and indicators
+            text: '#1e3a8a', // MLB navy blue for AI text
           },
         },
       },
       maxWidth: {
         container: '1000px',
+        'ai-banner': '75%',
       },
       maxHeight: {
         textarea: '120px',
+      },
+      spacing: {
+        'banner-padding': '1.5rem',
       },
     },
   },
