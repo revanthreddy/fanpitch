@@ -1,80 +1,65 @@
 import functions_framework
-from google import genai
-from google.genai import types
-from vertexai.preview.generative_models import GenerativeModel, GenerationConfig
-from vertexai.preview import generative_models
-import vertexai
-
-
-def ask_vertex():
-    vertexai.init(project="ethereal-temple-448819-n0", location="us-central1")
-
-    # Set up the model
-    model_name = "gemini-1.5-pro"  # Use the appropriate model name
-    model = GenerativeModel(model_name)
-
-    # Prepare the content
-    content = "how are yo"
-
-    # Configure generation settings
-    generation_config = GenerationConfig(
-        temperature=1,
-        top_p=0.95,
-        max_output_tokens=8192,
-        stop_sequences=None
-    )
-
-    # Set up safety settings
-    safety_settings = [
-        generative_models.SafetySetting(
-            category=generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-            threshold=generative_models.HarmBlockThreshold.BLOCK_NONE
-        ),
-        generative_models.SafetySetting(
-            category=generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-            threshold=generative_models.HarmBlockThreshold.BLOCK_NONE
-        ),
-        generative_models.SafetySetting(
-            category=generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-            threshold=generative_models.HarmBlockThreshold.BLOCK_NONE
-        ),
-        generative_models.SafetySetting(
-            category=generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT,
-            threshold=generative_models.HarmBlockThreshold.BLOCK_NONE
-        )
-    ]
-
-    # Generate content
-    try:
-        response = model.generate_content(
-            content,
-            generation_config=generation_config,
-            safety_settings=safety_settings
-        )
-        return ({"response" : response.text}, 200, {})
-    except Exception as e:
-        return ({"response" : e}, 500, {})
-
+from flask import make_response, jsonify
+from flask_cors import CORS, cross_origin
+from vertex_ai_utils import summarize_player_homerun_insights
+from urllib.parse import unquote
+from config import ALLOWED_LANGUAGES
 
 @functions_framework.http
 def handler(request):
-    """Handles HTTP requests with multiple endpoints.
+    if request.method == 'OPTIONS':
+        # Allows GET requests from any origin with the Content-Type
+        # header and caches preflight response for 3600s
+        headers = {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST',
+            'Access-Control-Allow-Headers': 'Content-Type',
+            'Access-Control-Max-Age': '3600'
+        }
+        return '', 204, headers
 
-  Args:
-      request (flask.Request): The request object.
+    headers = {'Access-Control-Allow-Origin': '*'}
 
-  Returns:
-      The response text.
-  """
     if request.method == 'GET' and request.path == '/':
-        return 'Welcome to the API'
+        return make_response('Welcome to the API', 200, headers)
     elif request.method == 'GET' and request.path == '/hello1':
-        return ("Hello World!", 200, {})
-    elif request.method == 'GET' and request.path == '/hello2':
-        return ask_vertex()
-    elif request.method == 'POST' and request.path == '/world':
+        return make_response("Hello World!", 200, headers)
+    elif request.method == 'GET' and request.path == '/playerinsights':
+        player = request.args.get('player')
+        if player is None:
+            return make_response(jsonify({"error": "Missing 'player' query parameter"}), 400, headers)
+        # URL decode the content
+        player = unquote(player)
+        response, status_code = summarize_player_homerun_insights(player=player)
+        return make_response(jsonify(response), status_code, headers)
+    elif request.method == 'POST' and request.path == '/translate':
+        if not request.is_json:
+            return make_response(jsonify({"error": "Request must be JSON"}), 400, headers)
+
+        data = request.get_json()
+        text = data.get('text')
+        translate_to = data.get('translate_to')
+
+        if not text or not translate_to:
+            return make_response(jsonify({"error": "Missing 'text' or 'translate_to' in request body"}), 400, headers)
+
+        if translate_to not in ALLOWED_LANGUAGES:
+            return make_response(jsonify({"error": f"'translate_to' must be one of {', '.join(ALLOWED_LANGUAGES)}"}),
+                                 400, headers)
+
+        # Process the text and translate_to fields here
+        # For this example, we'll just return them in a response
+        response = {
+            "original_text": text,
+            "translated_to": translate_to,
+            "translated_text": f"Translated '{text}' to {translate_to}"
+        }
+
+        return make_response(jsonify(response), 200, headers)
+
+    elif request.method == 'POST' and request.path == '/summarize':
         request_json = request.get_json(silent=True)
         name = request_json.get('name', 'World')
-        return f'Hello {name} from /world'
+        return make_response(f'Hello {name} from /world', 200, headers)
     else:
-        return 'default method', 200
+        return make_response('default method', 200, headers)
