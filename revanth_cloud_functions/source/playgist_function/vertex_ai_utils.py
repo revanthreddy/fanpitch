@@ -34,7 +34,7 @@ system_instructions_big_query_expert_homeruns = [
     "query should always use this dataset FROM `ethereal-temple-448819-n0.homeruns_dataset.tb_homeruns`"
 ]
 
-system_instructions_for_summary_homeruns_list  = [
+system_instructions_for_summary_homeruns_list = [
     "You are an MLB analytics expert analyzing home run data.",
     "The input is a JSON array of home run events with fields: play_id, title, ExitVelocity, "
     "HitDistance, LaunchAngle, and video.",
@@ -48,9 +48,11 @@ system_instructions_for_summary_homeruns_list  = [
     "Dont print the json which was submitted"
 ]
 
-system_instructions_for_language_translation =[
-    "you are a language translator"
+system_instructions_for_language_translation = [
+    "you are a language translator",
+    "just translate the text written"
 ]
+
 
 def summarize_home_run_list(homerun_list):
     model = GenerativeModel(model_name=MODEL_NAME,
@@ -129,7 +131,43 @@ def summarize_player_homerun_insights(player):
     except Exception as e:
         return {"response": str(e)}, 500
 
-def vertex_translate(object_to_translate):
-    pass
+
+def translate_text(object_to_translate):
+    system_instructions_for_language_translation.append(f' to {object_to_translate["translate_to"]}')
+    language_based_system_instructions = system_instructions_for_language_translation
+    model = GenerativeModel(model_name=MODEL_NAME,
+                            system_instruction=language_based_system_instructions)
+
+    generation_config = GenerationConfig(
+        temperature=1,
+        top_p=0.95,
+        max_output_tokens=8192,
+        stop_sequences=None,
+        response_mime_type="application/json",
+        response_schema={
+            "type": "object",
+            "properties": {
+                "translated_text": {"type": "string"}
+            },
+            "required": ["translated_text"]
+        }
+    )
+
+    safety_settings = genai_safety_settings
+
+    try:
+        response = model.generate_content(
+            object_to_translate["text"],
+            generation_config=generation_config,
+            safety_settings=safety_settings
+        )
+        return json.loads(response.text)["translated_text"]
+    except Exception as e:
+        raise e
+
 
 # print(summarize_player_homerun_insights(player="Miguel Montero"))
+# print(translate_text({
+#     "text": "hello",
+#     "translate_to": "English"
+# }))
