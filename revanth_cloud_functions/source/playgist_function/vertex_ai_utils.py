@@ -48,10 +48,6 @@ system_instructions_for_summary_homeruns_list = [
     "Dont print the json which was submitted"
 ]
 
-system_instructions_for_language_translation = [
-    "you are a language translator",
-    "just translate the text written"
-]
 
 
 def summarize_home_run_list(homerun_list):
@@ -133,10 +129,11 @@ def summarize_player_homerun_insights(player):
 
 
 def translate_text(object_to_translate):
-    system_instructions_for_language_translation.append(f' to {object_to_translate["translate_to"]}')
-    language_based_system_instructions = system_instructions_for_language_translation
+    system_instructions_for_language_translation = ["you are a language translator", "just translate the text written",
+                                                    f' to {object_to_translate["translate_to"]}']
+
     model = GenerativeModel(model_name=MODEL_NAME,
-                            system_instruction=language_based_system_instructions)
+                            system_instruction=system_instructions_for_language_translation)
 
     generation_config = GenerationConfig(
         temperature=1,
@@ -161,7 +158,8 @@ def translate_text(object_to_translate):
             generation_config=generation_config,
             safety_settings=safety_settings
         )
-        return json.loads(response.text)["translated_text"]
+        translated_text = json.loads(response.text)["translated_text"]
+        return {"translated_text" : translated_text} , 200
     except Exception as e:
         raise e
 
