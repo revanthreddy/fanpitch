@@ -48,6 +48,14 @@ system_instructions_for_summary_homeruns_list = [
     "Dont print the json which was submitted"
 ]
 
+system_instructions_for_interesting = [
+    "You are an expert baseball strategic analyst. Your job is to provide realtime strategic insights based on live "
+    "events provided to you. The insights should be relevant to a fantasy MLB group chat conversation that will also "
+    "be provided to you. Your response should be significant, appropriate, and concise (under 200 characters).",
+    "You will be give a json body that has two elements 'chat' and 'events'",
+    "chat is list of json items that fields id, text and user",
+    "events is a list of plays and its results for a particular time window",
+]
 
 
 def summarize_home_run_list(homerun_list):
@@ -128,6 +136,39 @@ def summarize_player_homerun_insights(player):
         return {"response": str(e)}, 500
 
 
+def get_me_something_interesting(conversation):
+    model = GenerativeModel(model_name=MODEL_NAME,
+                            system_instruction=system_instructions_for_interesting)
+
+    generation_config = GenerationConfig(
+        temperature=1,
+        top_p=0.95,
+        max_output_tokens=8192,
+        stop_sequences=None,
+        response_mime_type="application/json",
+        response_schema={
+            "type": "object",
+            "properties": {
+                "summary": {"type": "string"}
+            },
+            "required": ["summary"]
+        }
+    )
+
+    safety_settings = genai_safety_settings
+
+    try:
+        response = model.generate_content(
+            json.dumps(conversation),
+            generation_config=generation_config,
+            safety_settings=safety_settings
+        )
+        response = json.loads(response.text)
+        return response, 200
+    except Exception as e:
+        raise e
+
+
 def translate_text(object_to_translate):
     system_instructions_for_language_translation = ["you are a language translator", "just translate the text written",
                                                     f' to {object_to_translate["translate_to"]}']
@@ -159,13 +200,61 @@ def translate_text(object_to_translate):
             safety_settings=safety_settings
         )
         translated_text = json.loads(response.text)["translated_text"]
-        return {"translated_text" : translated_text} , 200
+        return {"translated_text": translated_text}, 200
     except Exception as e:
         raise e
-
 
 # print(summarize_player_homerun_insights(player="Miguel Montero"))
 # print(translate_text({
 #     "text": "hello",
 #     "translate_to": "English"
 # }))
+# conversation= {
+#   "chat": [
+#     {
+#       "id": "7",
+#       "text": "GRAND SLAM! Biggio YOU BEAUTIFUL MAN! 🎉",
+#       "sender": { "id": "user3", "name": "John", "avatar": "🏆" }
+#     },
+#     {
+#       "id": "8",
+#       "text": "Well, there goes my pitching stats for the week 😭",
+#       "sender": { "id": "user4", "name": "Alex", "avatar": "🔥", "isUser": True }
+#     },
+#     {
+#       "id": "9",
+#       "text": "That's baseball for ya! Anyone watching the Dodgers game? Yandy Diaz is heating up 👀",
+#       "sender": { "id": "user1", "name": "Mike", "avatar": "🎯" }
+#     }
+#   ],
+#   "events": [
+#     {
+#       "result": {
+#         "event": "Groundout",
+#         "eventType": "field_out",
+#         "description": "Cavan Biggio grounds out, second baseman Isaac Paredes to first baseman Yandy Diaz.",
+#         "isOut": True
+#       },
+#       "about": {
+#         "startTime": "2023-09-23T20:15:33.864Z",
+#         "endTime": "2023-09-23T20:16:19.204Z",
+#         "isComplete": True
+#       }
+#     },
+#     {
+#       "result": {
+#         "event": "Home Run",
+#         "eventType": "home_run",
+#         "description": "Yandy Diaz homers (21) on a fly ball to left center field.",
+#         "isOut": True
+#       },
+#       "about": {
+#         "startTime": "2023-09-23T20:18:20.687Z",
+#         "endTime": "2023-09-23T20:20:51.973Z",
+#         "isComplete": True
+#       }
+#     }
+#   ]
+# }
+#
+# print(get_me_something_interesting(conversation=conversation))
