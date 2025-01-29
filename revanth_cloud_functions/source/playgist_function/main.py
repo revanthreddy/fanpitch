@@ -4,6 +4,8 @@ from flask_cors import CORS, cross_origin
 from vertex_ai_utils import summarize_player_homerun_insights
 from vertex_ai_utils import translate_text
 from vertex_ai_utils import get_me_something_interesting
+from vertex_ai_utils import build_query_for_the_ask
+from vertex_ai_utils import summarize_ask_query_results
 from urllib.parse import unquote
 from config import ALLOWED_LANGUAGES
 
@@ -66,6 +68,17 @@ def handler(request):
             return make_response(jsonify({"error": "Missing required fields: 'chat' and 'events'"}), 400, headers)
 
         response, status = get_me_something_interesting(request_json)
+        return make_response(response, status, headers)
+
+    elif request.method == 'POST' and request.path == '/ask':
+        request_json = request.get_json(silent=True)
+        if not request.is_json:
+            return make_response(jsonify({"error": "Request must be JSON"}), 400, headers)
+
+        if "ask" not in request_json:
+            return make_response(jsonify({"error": "Missing required fields: 'ask'"}), 400, headers)
+
+        response, status = summarize_ask_query_results(request_json["ask"])
         return make_response(response, status, headers)
 
     else:
