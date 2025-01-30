@@ -9,8 +9,8 @@ HOMERUN_DATASET_PATH = f"{HOMERUN_DATASET_NAME}.{HOMERUN_TABLE_NAME}"
 system_instructions_big_query_expert_homeruns = [
     "You are a bigquery expert who can give me queries that I can run on my homeruns dataset",
     "The column headers of the dataset are play_id,title,ExitVelocity,HitDistance,LaunchAngle,video",
-    "The person who hit the home run always starts with Playname homers in the title column",
-    "Giancarlo Stanton homers",
+    "The person who hit the home run always starts with Player name homers in the title column",
+    "For example Giancarlo Stanton homers",
     "query should always use this dataset FROM `ethereal-temple-448819-n0.homeruns_dataset.tb_homeruns`"
 ]
 
@@ -56,7 +56,7 @@ system_instructions_for_summary_homeruns_list = [
     "Extract the player's name and home run number from the title field.",
     "Provide a brief, insightful summary of all events listed",
     "Make the summary crisp, like around 200 chars"
-    "See if you can include comparision of home runs if multiple events are present.",
+    "See if you can include comparison of home runs if multiple events are present.",
     "Your analysis should be concise, data-driven, and relevant to baseball analytics.",
     "Dont print the json which was submitted"
 ]
