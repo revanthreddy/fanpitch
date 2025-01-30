@@ -11,6 +11,7 @@ export interface ChatMessage {
   timestamp: number;
   text: string;
   sender: Participant;
+  videoUrl?: string;
 }
 
 export interface Conversation {

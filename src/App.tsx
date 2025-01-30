@@ -108,10 +108,24 @@ function App() {
   const handleGenerateResponse = async (prompt: string) => {
     setIsLoading(true);
     try {
-      const response = await generateResponse(prompt);
+      const response = await fetch(
+        'https://us-central1-ethereal-temple-448819-n0.cloudfunctions.net/playgist_function/ask',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            ask: prompt,
+          }),
+        },
+      );
+
+      const data = await response.json();
       const newMessage: ChatMessageType = {
         id: Math.random().toString(),
-        text: response,
+        text: data.summary,
+        videoUrl: data.clip,
         timestamp: getMockTime(),
         sender: BOT_SENDER,
       };

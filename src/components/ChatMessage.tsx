@@ -11,9 +11,17 @@ const ChatMessage = ({
   text,
   isSequential,
   sender,
+  videoUrl,
 }: ChatMessageProps) => {
   if (sender.isAI) {
-    return <AIBanner timestamp={timestamp} text={text} sender={sender} />;
+    return (
+      <AIBanner
+        timestamp={timestamp}
+        text={text}
+        sender={sender}
+        videoUrl={videoUrl}
+      />
+    );
   }
 
   return (
