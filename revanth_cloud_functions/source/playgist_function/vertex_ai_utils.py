@@ -220,7 +220,7 @@ def summarize_ask_query_results(ask):
     try:
         query_object = build_query_for_the_ask(ask)
         query_results, explanation = run_query_v2(query_object["query"], query_object["type"]), query_object["explanation"]
-        # print(query_results , explanation)
+        print(query_object, query_results , explanation)
         model = GenerativeModel(model_name=MODEL_NAME,
                                 system_instruction=system_instructions_for_ask_results_summary)
         combined_data = [query_results, {"ask": ask}]
@@ -251,7 +251,7 @@ def summarize_ask_query_results(ask):
         )
         summary = json.loads(response.text)["summary"]
         result = {"summary": summary}
-        if "clip" in query_object:
+        if "clip" in query_object and query_object["clip"] is not False:
             result["clip"] = query_results[0]["video"]
         return result, 200
     except Exception as e:
