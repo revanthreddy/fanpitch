@@ -27,10 +27,12 @@ const AIBanner = ({ text, sender }: ChatMessage) => {
   const [translatedText, setTranslatedText] = useState<string | null>(null);
   const [isTranslating, setIsTranslating] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isFlipped, setIsFlipped] = useState(false);
 
   const handleTranslate = async (language: string) => {
     setIsTranslating(true);
     setIsDropdownOpen(false);
+
     try {
       const response = await fetch(
         'https://us-central1-ethereal-temple-448819-n0.cloudfunctions.net/playgist_function/translate',
@@ -47,7 +49,12 @@ const AIBanner = ({ text, sender }: ChatMessage) => {
       );
 
       const data = await response.json();
-      setTranslatedText(data.translated_text || data.text);
+      const translatedContent = data.translated_text || data.text;
+      // Only flip if we got a different translation
+      if (translatedContent !== text) {
+        setTranslatedText(translatedContent);
+        setIsFlipped(true);
+      }
     } catch (error) {
       console.error('Translation failed:', error);
     } finally {
@@ -56,63 +63,94 @@ const AIBanner = ({ text, sender }: ChatMessage) => {
   };
 
   const handleResetTranslation = () => {
-    setTranslatedText(null);
+    setIsFlipped(false);
+    setTimeout(() => {
+      setTranslatedText(null);
+    }, 500); // Match the duration of the flip animation
   };
 
   return (
-    <div className="w-full flex justify-center my-8 relative">
-      <div className="max-w-ai-banner bg-gradient-to-r from-chat-ai-border-from via-chat-ai-border-via to-chat-ai-border-to rounded-lg p-[2px] shadow-lg hover:shadow-xl transition-all">
-        <div className="bg-white rounded-lg p-banner-padding relative">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-chat-ai-accent rounded-full animate-bounce" />
-              <span className="text-sm font-bold text-chat-ai-text uppercase tracking-wider">
-                MLB AI Assistant
-              </span>
+    <div className="w-full flex justify-center py-4 relative">
+      <div className="relative [perspective:1000px] max-w-ai-banner">
+        <div
+          className={`relative transition-all duration-500 [transform-style:preserve-3d] ${
+            isFlipped
+              ? '[transform:rotateX(-180deg)]'
+              : '[transform:rotateX(0deg)]'
+          }`}>
+          {/* Front face */}
+          <div className="bg-gradient-to-r from-chat-ai-border-from via-chat-ai-border-via to-chat-ai-border-to rounded-[10px] p-[2px] shadow-lg hover:shadow-xl [backface-visibility:hidden]">
+            <div className="bg-white rounded-lg p-banner-padding">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-chat-ai-accent rounded-full animate-bounce" />
+                  <span className="text-sm font-bold text-chat-ai-text uppercase tracking-wider">
+                    MLB AI Assistant
+                  </span>
+                </div>
+                <div className="text-xs text-gray-500">{sender?.name}</div>
+              </div>
+              <div className="text-chat-ai-text whitespace-pre-wrap font-medium">
+                {text}
+              </div>
             </div>
-            <div className="text-xs text-gray-500">{sender?.name}</div>
           </div>
 
-          <div className="text-chat-ai-text whitespace-pre-wrap font-medium">
-            {translatedText || text}
-          </div>
-          <div className="absolute -right-12 top-1/2 -translate-y-1/2">
-            {!translatedText ? (
-              <div
-                className="relative"
-                onMouseEnter={() => setIsDropdownOpen(true)}
-                onMouseLeave={() => setIsDropdownOpen(false)}>
-                <button
-                  disabled={isTranslating}
-                  className="w-8 h-8 text-lg bg-primary text-white rounded-full hover:bg-blue-600 disabled:bg-blue-300 disabled:cursor-not-allowed cursor-pointer whitespace-nowrap flex items-center justify-center">
-                  {isTranslating ? (
-                    <div className="animate-spin h-4 w-4 border-2 border-white rounded-full border-t-transparent" />
-                  ) : (
-                    <IoLanguage />
-                  )}
-                </button>
-                {isDropdownOpen && !isTranslating && (
-                  <div className="absolute top-0 mt-1 bg-white rounded-md shadow-lg border border-gray-200 py-1 z-50">
-                    {LANGUAGES.map((lang) => (
-                      <button
-                        key={lang.code}
-                        onClick={() => handleTranslate(lang.name)}
-                        className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 gap-2 cursor-pointer">
-                        {lang.icon}
-                        <span>{lang.name}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
+          {/* Back face */}
+          <div className="h-max bg-gradient-to-r from-chat-ai-border-from via-chat-ai-border-via to-chat-ai-border-to rounded-[10px] p-[2px] shadow-lg hover:shadow-xl absolute inset-0 [transform:rotateX(180deg)] [backface-visibility:hidden]">
+            <div className="bg-white rounded-lg p-banner-padding">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-chat-ai-accent rounded-full animate-bounce" />
+                  <span className="text-sm font-bold text-chat-ai-text uppercase tracking-wider">
+                    MLB AI Assistant
+                  </span>
+                </div>
+                <div className="text-xs text-gray-500">{sender?.name}</div>
               </div>
-            ) : (
-              <button
-                onClick={handleResetTranslation}
-                className="w-8 h-8 text-lg bg-primary text-white rounded-full hover:bg-blue-600 cursor-pointer flex items-center justify-center">
-                <IoMdArrowRoundBack />
-              </button>
-            )}
+              <div className="text-chat-ai-text whitespace-pre-wrap font-medium">
+                {translatedText}
+              </div>
+            </div>
           </div>
+        </div>
+
+        <div className="absolute -right-12 top-1/2 -translate-y-1/2">
+          {!translatedText ? (
+            <div
+              className="relative"
+              onMouseEnter={() => setIsDropdownOpen(true)}
+              onMouseLeave={() => setIsDropdownOpen(false)}>
+              <button
+                disabled={isTranslating}
+                className="w-8 h-8 text-lg bg-primary text-white rounded-full hover:bg-blue-600 disabled:bg-blue-300 disabled:cursor-not-allowed cursor-pointer whitespace-nowrap flex items-center justify-center transition-colors duration-200">
+                {isTranslating ? (
+                  <div className="animate-spin h-4 w-4 border-2 border-white rounded-full border-t-transparent" />
+                ) : (
+                  <IoLanguage />
+                )}
+              </button>
+              {isDropdownOpen && !isTranslating && (
+                <div className="absolute top-0 bg-white rounded-md shadow-lg border border-gray-200 py-1 z-50 transform transition-all duration-200 origin-left">
+                  {LANGUAGES.map((lang) => (
+                    <button
+                      key={lang.code}
+                      onClick={() => handleTranslate(lang.name)}
+                      className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 gap-2 cursor-pointer transition-colors duration-200">
+                      {lang.icon}
+                      <span>{lang.name}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              onClick={handleResetTranslation}
+              className="w-8 h-8 text-lg bg-primary text-white rounded-full hover:bg-blue-600 cursor-pointer flex items-center justify-center transition-colors duration-200">
+              <IoMdArrowRoundBack />
+            </button>
+          )}
         </div>
       </div>
     </div>
