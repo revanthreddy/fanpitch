@@ -56,7 +56,7 @@ const ChatInput = ({
           onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
-          className="flex-1 p-3 border border-gray-300 rounded-2xl resize-none focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none max-h-textarea min-h-[44px] leading-5 bg-gray-50"
+          className="flex-1 py-2.5 px-3 border border-gray-300 rounded-2xl resize-none focus:border-primary focus:ring-2 focus:ring-primary focus:outline-none max-h-textarea min-h-[44px] leading-5 bg-gray-50"
           rows={1}
           disabled={disabled}
         />
@@ -64,7 +64,7 @@ const ChatInput = ({
           <button
             onClick={() => handleSubmit(false)}
             disabled={disabled || !text.trim()}
-            className="flex-shrink-0 w-11 h-11 rounded-full bg-primary disabled:bg-gray-300 text-white flex items-center justify-center hover:bg-primary-dark disabled:hover:bg-gray-300 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:focus:ring-gray-300"
+            className="flex-shrink-0 w-11 h-11 rounded-full bg-primary disabled:bg-gray-300 text-white hover:brightness-125 hover:disabled:brightness-100 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:focus:ring-gray-300"
             title="Send message">
             <svg
               className="w-5 h-5"
@@ -81,7 +81,7 @@ const ChatInput = ({
             <button
               onClick={() => handleSubmit(true)}
               disabled={disabled || !text.trim()}
-              className="flex-shrink-0 w-11 h-11 rounded-full bg-chat-user-text disabled:bg-gray-300 text-white flex items-center justify-center hover:opacity-90 disabled:hover:bg-gray-300 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-chat-user-text disabled:focus:ring-gray-300"
+              className="flex-shrink-0 w-11 h-11 rounded-full bg-secondary disabled:bg-gray-300 text-white flex items-center justify-center hover:brightness-125 hover:disabled:brightness-100 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:focus:ring-gray-300"
               title="Send message and get AI response">
               <svg
                 className="w-5 h-5"

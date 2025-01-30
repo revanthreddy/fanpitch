@@ -27,30 +27,41 @@ const ChatMessage = ({
   return (
     <div
       className={clsx(
-        'group flex',
+        'group flex animate-float-in items-end',
         sender.isUser ? 'justify-end' : 'justify-start',
         !isSequential && 'mt-4',
       )}>
       {!sender.isUser && !isSequential && (
-        <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-medium mr-2 flex-shrink-0">
+        <div className="w-10 h-10 rounded-full bg-primary-light text-white flex items-center justify-center text-sm font-medium mr-2 flex-shrink-0 shadow-avatar">
           {sender.avatar || 'G'}
         </div>
       )}
       <div
         className={clsx(
-          'relative max-w-[80%] px-4 py-2 rounded-2xl break-words',
+          'relative max-w-[80%] px-4 py-2 rounded-2xl break-words transition-all duration-200',
           sender.isUser
-            ? 'bg-chat-user-bg text-chat-user-text rounded-br-sm'
-            : 'bg-chat-bot-bg text-chat-bot-text rounded-bl-sm',
-          isSequential && (sender.isUser ? 'mr-10' : 'ml-10'),
+            ? `bg-chat-user-bg text-chat-user-text ${
+                isSequential ? 'rounded-tr-sm' : 'rounded-br-sm'
+              } shadow-message shadow-chat-user-shadow`
+            : `bg-chat-message-bg text-chat-message-text ${
+                isSequential ? 'rounded-tl-sm' : 'rounded-bl-sm'
+              } shadow-message shadow-chat-message-shadow`,
+          isSequential && (sender.isUser ? 'mr-12' : 'ml-12'),
+          'hover:shadow-lg hover:-translate-y-[1px] transition-all duration-200',
         )}>
         {!isSequential && sender && (
-          <div className="text-xs text-gray-500 mb-1">{sender.name}</div>
+          <div
+            className={clsx(
+              'text-xs mb-1',
+              sender.isUser ? 'text-chat-user-text/75' : 'text-gray-500',
+            )}>
+            {sender.name}
+          </div>
         )}
         <div className="whitespace-pre-wrap">{text}</div>
       </div>
       {sender.isUser && !isSequential && (
-        <div className="w-8 h-8 rounded-full bg-chat-user-text text-white flex items-center justify-center text-sm font-medium ml-2 flex-shrink-0">
+        <div className="w-10 h-10 rounded-full bg-primary-light text-white flex items-center justify-center text-sm font-medium ml-2 flex-shrink-0 shadow-avatar">
           {sender?.avatar || 'U'}
         </div>
       )}

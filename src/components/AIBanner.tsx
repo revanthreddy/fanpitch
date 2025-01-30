@@ -71,7 +71,7 @@ const AIBanner = ({ text, sender, videoUrl }: ChatMessage) => {
 
   return (
     <div className="w-full flex justify-center py-4 relative">
-      <div className="relative [perspective:1000px] max-w-ai-banner">
+      <div className="relative [perspective:1000px] max-w-ai-banner animate-float-in">
         <div
           className={`relative transition-all duration-500 [transform-style:preserve-3d] ${
             isFlipped
@@ -79,7 +79,7 @@ const AIBanner = ({ text, sender, videoUrl }: ChatMessage) => {
               : '[transform:rotateX(0deg)]'
           }`}>
           {/* Front face */}
-          <div className="bg-gradient-to-r from-chat-ai-border-from via-chat-ai-border-via to-chat-ai-border-to rounded-[10px] p-[2px] shadow-lg hover:shadow-xl [backface-visibility:hidden]">
+          <div className="bg-gradient-to-r from-chat-ai-border-from via-chat-ai-border-via to-chat-ai-border-to rounded-xl p-[4px] shadow-lg hover:shadow-xl [backface-visibility:hidden]">
             <div className="bg-white rounded-lg p-banner-padding">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center space-x-2">
@@ -105,7 +105,7 @@ const AIBanner = ({ text, sender, videoUrl }: ChatMessage) => {
           </div>
 
           {/* Back face */}
-          <div className="h-max bg-gradient-to-r from-chat-ai-border-from via-chat-ai-border-via to-chat-ai-border-to rounded-[10px] p-[2px] shadow-lg hover:shadow-xl absolute inset-0 [transform:rotateX(180deg)] [backface-visibility:hidden]">
+          <div className="h-max bg-gradient-to-r from-chat-ai-border-from via-chat-ai-border-via to-chat-ai-border-to rounded-xl p-[4px] shadow-lg hover:shadow-xl absolute inset-0 [transform:rotateX(180deg)] [backface-visibility:hidden]">
             <div className="bg-white rounded-lg p-banner-padding">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center space-x-2">
@@ -139,7 +139,7 @@ const AIBanner = ({ text, sender, videoUrl }: ChatMessage) => {
               onMouseLeave={() => setIsDropdownOpen(false)}>
               <button
                 disabled={isTranslating}
-                className="w-8 h-8 text-lg bg-primary text-white rounded-full hover:bg-blue-600 disabled:bg-blue-300 disabled:cursor-not-allowed cursor-pointer whitespace-nowrap flex items-center justify-center transition-colors duration-200">
+                className="w-8 h-8 text-lg bg-secondary text-white rounded-full hover:bg-blue-600 disabled:bg-blue-300 disabled:cursor-not-allowed cursor-pointer whitespace-nowrap flex items-center justify-center transition-colors duration-200">
                 {isTranslating ? (
                   <div className="animate-spin h-4 w-4 border-2 border-white rounded-full border-t-transparent" />
                 ) : (

@@ -169,8 +169,8 @@ function App() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100 font-sans antialiased">
-      <header className="bg-primary px-6 py-4 shadow-md">
+    <div className="flex flex-col h-screen bg-gray-100 font-sans antialiased bg-[url('/baseballs.jpg')] bg-contain">
+      <header className="backdrop-blur-md bg-primary/75 px-6 py-4 shadow-md">
         <div className="max-w-container mx-auto">
           <h1 className="text-white text-xl font-medium flex items-center gap-2">
             <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
@@ -181,7 +181,7 @@ function App() {
         </div>
       </header>
 
-      <main className="flex-1 max-w-container w-full mx-auto flex flex-col bg-white shadow-xl rounded-lg my-4 overflow-hidden">
+      <main className="backdrop-blur-md bg-gray-100/75 flex-1 max-w-container w-full mx-auto flex flex-col shadow-xl rounded-lg my-4 overflow-hidden">
         <div className="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth">
           <div className="flex flex-col space-y-4">
             {messages.map((message, index) => (
