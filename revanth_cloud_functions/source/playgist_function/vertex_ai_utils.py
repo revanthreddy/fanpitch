@@ -196,14 +196,14 @@ def build_query_for_the_ask(ask):
             "properties": {
                 "query": {"type": "string"},
                 "type": {"type": "string"},
-                "explanation": {"type": "string"}
+                "explanation": {"type": "string"},
+                "clip": {"type": "boolean"}
             },
             "required": ["query", "explanation", "type"]
         }
     )
 
     safety_settings = genai_safety_settings
-
 
     response = model.generate_content(
         content,
@@ -219,16 +219,16 @@ def build_query_for_the_ask(ask):
 def summarize_ask_query_results(ask):
     try:
         query_object = build_query_for_the_ask(ask)
-        results , explanation = run_query_v2(query_object["query"], query_object["type"]), query_object["explanation"]
-        # print(results , explanation)
+        query_results, explanation = run_query_v2(query_object["query"], query_object["type"]), query_object["explanation"]
+        # print(query_results , explanation)
         model = GenerativeModel(model_name=MODEL_NAME,
                                 system_instruction=system_instructions_for_ask_results_summary)
-        combined_data = [results , {"ask" : ask}]
+        combined_data = [query_results, {"ask": ask}]
         # print(combined_data)
         content = json.dumps(combined_data)
 
         generation_config = GenerationConfig(
-            temperature=1,
+            temperature=1.5,
             top_p=0.95,
             max_output_tokens=8192,
             stop_sequences=None,
@@ -250,7 +250,10 @@ def summarize_ask_query_results(ask):
             safety_settings=safety_settings
         )
         summary = json.loads(response.text)["summary"]
-        return {"summary": summary}, 200
+        result = {"summary": summary}
+        if "clip" in query_object:
+            result["clip"] = query_results[0]["video"]
+        return result, 200
     except Exception as e:
         raise e
 

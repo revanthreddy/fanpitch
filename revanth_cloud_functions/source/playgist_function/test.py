@@ -61,4 +61,6 @@ from vertex_ai_utils import summarize_ask_query_results
 # print(get_me_something_interesting(conversation=conversation))
 
 
-print(summarize_ask_query_results("tell  me about  top 5, 100 yards homers"))
+# print(summarize_ask_query_results("tell  me about  top 5, 100 yards homers"))
+
+print(summarize_ask_query_results("what are the top 3 homeruns of Ohtani's"))
