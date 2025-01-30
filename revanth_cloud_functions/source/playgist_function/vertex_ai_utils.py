@@ -3,7 +3,12 @@ from vertexai.preview import generative_models
 import vertexai
 import json
 from config import PROJECT_ID, LOCATION, MODEL_NAME
-from bigquery_utils import run_query
+from bigquery_utils import run_query, run_query_v2
+from config import system_instructions_big_query_expert_homeruns
+from config import system_instructions_big_query_expert_ask
+from config import system_instructions_for_summary_homeruns_list
+from config import system_instructions_for_interesting
+from config import system_instructions_for_ask_results_summary
 
 vertexai.init(project=PROJECT_ID, location=LOCATION)
 
@@ -25,29 +30,6 @@ genai_safety_settings = [
         threshold=generative_models.HarmBlockThreshold.BLOCK_NONE
     )
 ]
-
-system_instructions_big_query_expert_homeruns = [
-    "You are a bigquery expert who can give me queries that I can run on my homeruns dataset",
-    "The column headers of the dataset are play_id,title,ExitVelocity,HitDistance,LaunchAngle,video",
-    "The person who hit the home run always starts with Playname homers in the title column",
-    "Giancarlo Stanton homers",
-    "query should always use this dataset FROM `ethereal-temple-448819-n0.homeruns_dataset.tb_homeruns`"
-]
-
-system_instructions_for_summary_homeruns_list = [
-    "You are an MLB analytics expert analyzing home run data.",
-    "The input is a JSON array of home run events with fields: play_id, title, ExitVelocity, "
-    "HitDistance, LaunchAngle, and video.",
-    "Analyze the data to provide insights on the player's performance, focusing on available metrics.",
-    "If ExitVelocity, HitDistance, or LaunchAngle are null or 0, mention the lack of data for those metrics.",
-    "Extract the player's name and home run number from the title field.",
-    "Provide a brief, insightful summary of all events listed",
-    "Make the summary crisp, like around 200 chars"
-    "See if you can include comparision of home runs if multiple events are present.",
-    "Your analysis should be concise, data-driven, and relevant to baseball analytics.",
-    "Dont print the json which was submitted"
-]
-
 
 
 def summarize_home_run_list(homerun_list):
@@ -128,6 +110,39 @@ def summarize_player_homerun_insights(player):
         return {"response": str(e)}, 500
 
 
+def get_me_something_interesting(conversation):
+    model = GenerativeModel(model_name=MODEL_NAME,
+                            system_instruction=system_instructions_for_interesting)
+
+    generation_config = GenerationConfig(
+        temperature=1,
+        top_p=0.95,
+        max_output_tokens=8192,
+        stop_sequences=None,
+        response_mime_type="application/json",
+        response_schema={
+            "type": "object",
+            "properties": {
+                "summary": {"type": "string"}
+            },
+            "required": ["summary"]
+        }
+    )
+
+    safety_settings = genai_safety_settings
+
+    try:
+        response = model.generate_content(
+            json.dumps(conversation),
+            generation_config=generation_config,
+            safety_settings=safety_settings
+        )
+        response = json.loads(response.text)
+        return response, 200
+    except Exception as e:
+        raise e
+
+
 def translate_text(object_to_translate):
     system_instructions_for_language_translation = ["you are a language translator", "just translate the text written",
                                                     f' to {object_to_translate["translate_to"]}']
@@ -159,13 +174,87 @@ def translate_text(object_to_translate):
             safety_settings=safety_settings
         )
         translated_text = json.loads(response.text)["translated_text"]
-        return {"translated_text" : translated_text} , 200
+        return {"translated_text": translated_text}, 200
     except Exception as e:
         raise e
 
 
-# print(summarize_player_homerun_insights(player="Miguel Montero"))
-# print(translate_text({
-#     "text": "hello",
-#     "translate_to": "English"
-# }))
+def build_query_for_the_ask(ask):
+    model = GenerativeModel(model_name=MODEL_NAME,
+                            system_instruction=system_instructions_big_query_expert_ask)
+
+    content = ask
+
+    generation_config = GenerationConfig(
+        temperature=1,
+        top_p=0.95,
+        max_output_tokens=8192,
+        stop_sequences=None,
+        response_mime_type="application/json",
+        response_schema={
+            "type": "object",
+            "properties": {
+                "query": {"type": "string"},
+                "type": {"type": "string"},
+                "explanation": {"type": "string"},
+                "clip": {"type": "boolean"}
+            },
+            "required": ["query", "explanation", "type"]
+        }
+    )
+
+    safety_settings = genai_safety_settings
+
+    response = model.generate_content(
+        content,
+        generation_config=generation_config,
+        safety_settings=safety_settings
+    )
+    query_object = json.loads(response.text)
+    # print(query_object["query"])
+    # return run_query_v2(query_object["query"], query_object["type"]), query_object["explanation"]
+    return query_object
+
+
+def summarize_ask_query_results(ask):
+    try:
+        query_object = build_query_for_the_ask(ask)
+        query_results, explanation = run_query_v2(query_object["query"], query_object["type"]), query_object["explanation"]
+        # print(query_results , explanation)
+        model = GenerativeModel(model_name=MODEL_NAME,
+                                system_instruction=system_instructions_for_ask_results_summary)
+        combined_data = [query_results, {"ask": ask}]
+        # print(combined_data)
+        content = json.dumps(combined_data)
+
+        generation_config = GenerationConfig(
+            temperature=1.5,
+            top_p=0.95,
+            max_output_tokens=8192,
+            stop_sequences=None,
+            response_mime_type="application/json",
+            response_schema={
+                "type": "object",
+                "properties": {
+                    "summary": {"type": "string"}
+                },
+                "required": ["summary"]
+            }
+        )
+
+        safety_settings = genai_safety_settings
+
+        response = model.generate_content(
+            content,
+            generation_config=generation_config,
+            safety_settings=safety_settings
+        )
+        summary = json.loads(response.text)["summary"]
+        result = {"summary": summary}
+        if "clip" in query_object:
+            result["clip"] = query_results[0]["video"]
+        return result, 200
+    except Exception as e:
+        raise e
+
+    pass

@@ -3,6 +3,9 @@ from flask import make_response, jsonify
 from flask_cors import CORS, cross_origin
 from vertex_ai_utils import summarize_player_homerun_insights
 from vertex_ai_utils import translate_text
+from vertex_ai_utils import get_me_something_interesting
+from vertex_ai_utils import build_query_for_the_ask
+from vertex_ai_utils import summarize_ask_query_results
 from urllib.parse import unquote
 from config import ALLOWED_LANGUAGES
 
@@ -48,14 +51,6 @@ def handler(request):
         if translate_to not in ALLOWED_LANGUAGES:
             return make_response(jsonify({"error": f"'translate_to' must be one of {', '.join(ALLOWED_LANGUAGES)}"}),
                                  400, headers)
-
-        # Process the text and translate_to fields here
-        # For this example, we'll just return them in a response
-        # response = {
-        #     "original_text": text,
-        #     "translated_to": translate_to,
-        #     "translated_text": f"Translated '{text}' to {translate_to}"
-        # }
         response, status_code = translate_text(object_to_translate={"text": text, "translate_to": translate_to})
         return make_response(jsonify(response), 200, headers)
 
@@ -63,5 +58,28 @@ def handler(request):
         request_json = request.get_json(silent=True)
         name = request_json.get('name', 'World')
         return make_response(f'Hello {name} from /world', 200, headers)
+
+    elif request.method == 'POST' and request.path == '/interesting':
+        request_json = request.get_json(silent=True)
+        if not request.is_json:
+            return make_response(jsonify({"error": "Request must be JSON"}), 400, headers)
+
+        if "chat" not in request_json or "events" not in request_json:
+            return make_response(jsonify({"error": "Missing required fields: 'chat' and 'events'"}), 400, headers)
+
+        response, status = get_me_something_interesting(request_json)
+        return make_response(response, status, headers)
+
+    elif request.method == 'POST' and request.path == '/ask':
+        request_json = request.get_json(silent=True)
+        if not request.is_json:
+            return make_response(jsonify({"error": "Request must be JSON"}), 400, headers)
+
+        if "ask" not in request_json:
+            return make_response(jsonify({"error": "Missing required fields: 'ask'"}), 400, headers)
+
+        response, status = summarize_ask_query_results(request_json["ask"])
+        return make_response(response, status, headers)
+
     else:
         return make_response('default method', 200, headers)
