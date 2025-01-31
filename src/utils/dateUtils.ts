@@ -3,7 +3,7 @@
  * This corresponds to the start of our conversation snippet from the MLB game
  */
 export const MOCK_CONVERSATION_BASE_TIME = new Date(
-  '2024-09-19T22:52:00.211Z',
+  '2024-09-19T22:54:45.211Z',
 ).getTime();
 
 // Store initialization time to calculate offset
