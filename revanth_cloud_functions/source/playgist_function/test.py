@@ -62,31 +62,31 @@ from config import GAME_PK
 # print(get_me_something_interesting(conversation=conversation))
 
 
-# print(summarize_ask_query_results("tell  me about  top 5, 100 yards homers"))
+print(summarize_ask_query_results("tell  me about  top 5, 100 yards homers"))
 
 # print(summarize_ask_query_results("how many home runs did Jesús Sánchez hit?"))
 
-start = "20240919_214811"
-end = "20240919_234610"
-
-# print(plays_diff(gamePk=GAME_PK, timecode1=start , timecode2="20240919_223320"))
-
-
-conversation = {
-    "chat": [
-        {
-            "id": "1",
-            "text": "Here comes Muncy! Let's see if he can keep the inning alive.",
-            "sender": {
-                "id": "user3",
-                "name": "John",
-                "avatar": "🏆"
-            },
-            "timestamp": 1726786342211
-        }
-    ],
-    "start": start,
-    "end": end
-}
-
-print(get_me_something_interesting(conversation))
+# start = "20240919_214811"
+# end = "20240919_234610"
+#
+# # print(plays_diff(gamePk=GAME_PK, timecode1=start , timecode2="20240919_223320"))
+#
+#
+# conversation = {
+#     "chat": [
+#         {
+#             "id": "1",
+#             "text": "Here comes Muncy! Let's see if he can keep the inning alive.",
+#             "sender": {
+#                 "id": "user3",
+#                 "name": "John",
+#                 "avatar": "🏆"
+#             },
+#             "timestamp": 1726786342211
+#         }
+#     ],
+#     "start": start,
+#     "end": end
+# }
+#
+# print(get_me_something_interesting(conversation))

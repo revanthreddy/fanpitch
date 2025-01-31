@@ -65,8 +65,8 @@ def handler(request):
         if "chat" not in request_json or "start" not in request_json or  "end" not in request_json:
             return make_response(jsonify({"error": "Missing required fields: 'chat' , 'start' and 'end'"}), 400, headers)
 
-        # response, status = get_me_something_interesting(request_json)
-        response, status = {"summery" : "Interesting details coming sooon !!!!"}, 200
+        response, status = get_me_something_interesting(request_json)
+        # response, status = {"summery" : "Interesting details coming sooon !!!!"}, 200
         return make_response(response, status, headers)
 
     elif request.method == 'POST' and request.path == '/ask':
