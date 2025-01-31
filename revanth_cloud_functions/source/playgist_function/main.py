@@ -1,14 +1,16 @@
 import functions_framework
 from flask import make_response, jsonify
 from flask_cors import CORS, cross_origin
+
+from revanth_cloud_functions.source.playgist_function.bigquery_utils import videos_urls_for_plays
 from vertex_ai_utils import summarize_player_homerun_insights
 from vertex_ai_utils import translate_text
 from vertex_ai_utils import get_me_something_interesting
 from vertex_ai_utils import build_query_for_the_ask
 from vertex_ai_utils import summarize_ask_query_results
 from urllib.parse import unquote
-from config import ALLOWED_LANGUAGES
-
+from config import ALLOWED_LANGUAGES, GAME_PK
+from mlb_api_utils import plays_diff
 
 @functions_framework.http
 def handler(request):
@@ -65,8 +67,16 @@ def handler(request):
         if "chat" not in request_json or "start" not in request_json or  "end" not in request_json:
             return make_response(jsonify({"error": "Missing required fields: 'chat' , 'start' and 'end'"}), 400, headers)
 
+        # Use in get_me_something_interesting. Saves an extra network call
+        diff_plays = plays_diff(GAME_PK, request_json['start'], request_json['end'])
+
         response, status = get_me_something_interesting(request_json)
-        # response, status = {"summery" : "Interesting details coming sooon !!!!"}, 200
+        # response, status = {"summary" : "Interesting details coming sooon !!!!"}, 200
+
+        video_urls = videos_urls_for_plays(diff_plays)
+        if len(video_urls) > 0:
+            response['videos'] = video_urls
+
         return make_response(response, status, headers)
 
     elif request.method == 'POST' and request.path == '/ask':
