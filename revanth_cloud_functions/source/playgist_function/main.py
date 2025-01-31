@@ -27,8 +27,6 @@ def handler(request):
 
     if request.method == 'GET' and request.path == '/':
         return make_response('Welcome to the API', 200, headers)
-    elif request.method == 'GET' and request.path == '/hello1':
-        return make_response("Hello World!", 200, headers)
     elif request.method == 'GET' and request.path == '/playerinsights':
         player = request.args.get('player')
         if player is None:
@@ -64,10 +62,11 @@ def handler(request):
         if not request.is_json:
             return make_response(jsonify({"error": "Request must be JSON"}), 400, headers)
 
-        if "chat" not in request_json or "events" not in request_json:
-            return make_response(jsonify({"error": "Missing required fields: 'chat' and 'events'"}), 400, headers)
+        if "chat" not in request_json or "start" not in request_json or  "end" not in request_json:
+            return make_response(jsonify({"error": "Missing required fields: 'chat' , 'start' and 'end'"}), 400, headers)
 
-        response, status = get_me_something_interesting(request_json)
+        # response, status = get_me_something_interesting(request_json)
+        response, status = {"summery" : "Interesting details coming sooon !!!!"}, 200
         return make_response(response, status, headers)
 
     elif request.method == 'POST' and request.path == '/ask':
