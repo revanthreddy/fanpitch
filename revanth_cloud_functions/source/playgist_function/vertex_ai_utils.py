@@ -4,11 +4,15 @@ import vertexai
 import json
 from config import PROJECT_ID, LOCATION, MODEL_NAME
 from bigquery_utils import run_query, run_query_v2
+import config
 from config import system_instructions_big_query_expert_homeruns
 from config import system_instructions_big_query_expert_ask
 from config import system_instructions_for_summary_homeruns_list
 from config import system_instructions_for_interesting
 from config import system_instructions_for_ask_results_summary
+from config import system_instructions_for_interesting_v2
+from config import GAME_PK
+from mlb_api_utils import plays, top_performers, plays_diff
 
 vertexai.init(project=PROJECT_ID, location=LOCATION)
 
@@ -111,11 +115,17 @@ def summarize_player_homerun_insights(player):
 
 
 def get_me_something_interesting(conversation):
+    input_to_the_model = {
+        "chat": conversation["chat"],
+        "top_performers_start_window": top_performers(GAME_PK, timecode=conversation["start"]),
+        "top_performers_end_window": top_performers(GAME_PK, timecode=conversation["end"])
+    }
+
     model = GenerativeModel(model_name=MODEL_NAME,
-                            system_instruction=system_instructions_for_interesting)
+                            system_instruction=system_instructions_for_interesting_v2)
 
     generation_config = GenerationConfig(
-        temperature=1,
+        temperature=2,
         top_p=0.95,
         max_output_tokens=8192,
         stop_sequences=None,
@@ -133,7 +143,7 @@ def get_me_something_interesting(conversation):
 
     try:
         response = model.generate_content(
-            json.dumps(conversation),
+            json.dumps(input_to_the_model),
             generation_config=generation_config,
             safety_settings=safety_settings
         )
@@ -219,8 +229,9 @@ def build_query_for_the_ask(ask):
 def summarize_ask_query_results(ask):
     try:
         query_object = build_query_for_the_ask(ask)
-        query_results, explanation = run_query_v2(query_object["query"], query_object["type"]), query_object["explanation"]
-        print(query_object, query_results , explanation)
+        query_results, explanation = run_query_v2(query_object["query"], query_object["type"]), query_object[
+            "explanation"]
+        print(query_object, query_results, explanation)
         model = GenerativeModel(model_name=MODEL_NAME,
                                 system_instruction=system_instructions_for_ask_results_summary)
         combined_data = [query_results, {"ask": ask}]
