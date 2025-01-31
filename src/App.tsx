@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { ChatMessage as ChatMessageType, Participant } from './types';
-import { useVertexAI } from './hooks/useVertexAI';
 import ChatMessage from './components/ChatMessage';
 import ChatInput from './components/ChatInput';
 import { useChatSimulation } from './hooks/useChatSimulation';
@@ -34,7 +33,6 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesRef = useRef<ChatMessageType[]>([]);
-  const { initialize, generateResponse } = useVertexAI();
   const mlbDataForwarder = useRef(MLBDataForwarder.getInstance());
   const mlbPoller = useRef<MLBStatsPoller | null>(null);
 
@@ -42,10 +40,6 @@ function App() {
   useEffect(() => {
     messagesRef.current = messages;
   }, [messages]);
-
-  useEffect(() => {
-    initialize().catch(console.error);
-  }, [initialize]);
 
   const handleMLBUpdate = useCallback(async (mlbData: MLBGameResponse) => {
     try {
@@ -63,6 +57,7 @@ function App() {
       const newMessage: ChatMessageType = {
         id: Math.random().toString(),
         text: response.summary,
+        videoUrl: response.clip,
         timestamp: getMockTime(),
         sender: BOT_SENDER,
       };

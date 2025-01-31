@@ -1,25 +1,8 @@
 import { getMockTime } from './dateUtils';
 
-interface MLBGamePlay {
-  result: {
-    description: string;
-    event: string;
-    eventType: string;
-    isOut: boolean;
-  };
-  about: {
-    startTime: string;
-    endTime: string;
-    isComplete: boolean;
-  };
-}
-
 export interface MLBGameResponse {
-  liveData: {
-    plays: {
-      allPlays: MLBGamePlay[];
-    };
-  };
+  start: string | null;
+  end: string | null;
 }
 
 const MLB_GAME_ID = '746011';
@@ -46,7 +29,7 @@ export class MLBStatsPoller {
   }
 
   public static getInstance(
-    pollIntervalMs: number = 10000,
+    pollIntervalMs: number = 2000,
     endTime: number,
     onUpdate: (response: MLBGameResponse) => void,
   ): MLBStatsPoller {
@@ -80,7 +63,6 @@ export class MLBStatsPoller {
     timestamps: string[],
     currentTime: string,
   ): string {
-    console.log('current time', currentTime);
     return timestamps.reduce((closest, timestamp) => {
       if (timestamp <= currentTime && timestamp > closest) {
         return timestamp;
@@ -115,42 +97,6 @@ export class MLBStatsPoller {
     }
   }
 
-  private async fetchMLBStats(): Promise<MLBGameResponse> {
-    this.lastPollTime = this.findClosestPastTimestamp(
-      this.availableTimestamps,
-      this.getCurrentTimestamp(),
-    );
-
-    console.log('current timecode', this.lastPollTime);
-
-    const url = `https://statsapi.mlb.com/api/v1.1/game/${MLB_GAME_ID}/feed/live?timecode=${this.lastPollTime}&fields=liveData,plays,allPlays,result,description,event,eventType,isOut,about,startTime,endTime,isComplete`;
-
-    console.log('fetching url', url);
-
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`MLB API request failed: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-
-    const plays = data.liveData?.plays?.allPlays || [];
-    if (plays.length > 0) {
-      const lastPlay = plays[plays.length - 1];
-      if (lastPlay.about?.endTime) {
-        const newTimestamp = lastPlay.about.endTime
-          .replace(/[^0-9]/g, '')
-          .replace(/(\d{8})(\d{6})/, '$1_$2');
-
-        if (this.availableTimestamps.includes(newTimestamp)) {
-          this.lastPollTime = newTimestamp;
-        }
-      }
-    }
-
-    return data;
-  }
-
   private async poll() {
     try {
       if (!this.shouldContinuePolling()) {
@@ -159,9 +105,16 @@ export class MLBStatsPoller {
         return;
       }
 
-      console.log('Fetching MLB stats');
-      const mlbData = await this.fetchMLBStats();
-      this.onUpdate(mlbData);
+      const currentTimestamp = this.getCurrentTimestamp();
+      const newTimestamp = this.findClosestPastTimestamp(
+        this.availableTimestamps,
+        currentTimestamp,
+      );
+
+      if (newTimestamp > (this.lastPollTime || 0)) {
+        this.onUpdate({ start: this.lastPollTime, end: newTimestamp });
+        this.lastPollTime = newTimestamp;
+      }
     } catch (error) {
       console.error('Error during polling:', error);
     }

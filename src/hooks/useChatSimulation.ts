@@ -26,7 +26,6 @@ export function useChatSimulation(
         const timeoutId = window.setTimeout(() => {
           setMessages((prev) => {
             if (prev.find((msg) => msg.id === message.id)) return prev;
-            console.log('adding message', message.timestamp);
             return [...prev, message];
           });
         }, delay);

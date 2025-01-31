@@ -7,6 +7,7 @@ const MLB_FORWARDING_ENDPOINT =
 
 export interface MLBForwardingResponse {
   summary: string;
+  clip: string;
 }
 
 export class MLBDataForwarder {
@@ -34,7 +35,7 @@ export class MLBDataForwarder {
   }
 
   public async forwardData(
-    mlbData: MLBGameResponse,
+    window: MLBGameResponse,
     conversation: Conversation,
   ): Promise<MLBForwardingResponse> {
     const filteredConversation = this.getFilteredConversation(conversation);
@@ -47,7 +48,7 @@ export class MLBDataForwarder {
         },
         body: JSON.stringify({
           chat: filteredConversation,
-          events: mlbData,
+          ...window,
         }),
       });
 
