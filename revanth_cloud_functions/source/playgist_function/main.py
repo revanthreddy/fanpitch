@@ -2,7 +2,7 @@ import functions_framework
 from flask import make_response, jsonify
 from flask_cors import CORS, cross_origin
 
-from revanth_cloud_functions.source.playgist_function.bigquery_utils import videos_urls_for_plays
+from bigquery_utils import videos_urls_for_plays
 from vertex_ai_utils import summarize_player_homerun_insights
 from vertex_ai_utils import translate_text
 from vertex_ai_utils import get_me_something_interesting

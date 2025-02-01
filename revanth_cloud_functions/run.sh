@@ -27,7 +27,9 @@ gcloud functions deploy "$function_name" \
     --region="$region" \
     --source="$source_dir" \
     --entry-point="$entry_point" \
-    --memory="$memory"
+    --memory="$memory" \
+    --timeout="300"
+
 
 deployment_status=$?
 

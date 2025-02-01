@@ -5,6 +5,7 @@ from vertex_ai_utils import build_query_for_the_ask
 from vertex_ai_utils import summarize_ask_query_results
 from mlb_api_utils import plays, top_performers, plays_diff
 from config import GAME_PK
+import bigquery_utils
 
 # print(summarize_player_homerun_insights(player="Miguel Montero"))
 # print(translate_text({
@@ -90,3 +91,6 @@ print(summarize_ask_query_results("tell  me about  top 5, 100 yards homers"))
 # }
 #
 # print(get_me_something_interesting(conversation))
+
+
+# bigquery_utils.videos_urls_for_plays([])

@@ -1,7 +1,7 @@
 from google.cloud import bigquery
 import json
 
-from revanth_cloud_functions.source.playgist_function.config import HOMERUN_DATASET_PATH
+from config import HOMERUN_DATASET_PATH
 
 big_query_client = bigquery.Client()
 
