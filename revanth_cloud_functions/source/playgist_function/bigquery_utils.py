@@ -52,4 +52,4 @@ def videos_urls_for_plays(plays):
     if len(home_run_descriptions) == 0:
         return []
     query = f'SELECT DISTINCT(video) FROM {HOMERUN_DATASET_PATH} WHERE title IN (\'{'\',\''.join(home_run_descriptions)}\');'
-    rows = big_query_client.query_and_wait(query)
+    return run_query_v2(query, None)

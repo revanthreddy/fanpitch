@@ -27,9 +27,21 @@ def plays_diff(gamePk: int, timecode1: str, timecode2: str):
     if len(timecode1_plays) == 0:
         return timecode2_plays
 
+    # Search backwards in timecode1 plays to find the last complete play.
+    # Could be made simpler since it's probably not possible to have two incomplete plays.
+    last_complete_timecode1_play_idx = None
+    curr_idx = len(timecode1_plays) - 1
+    while not last_complete_timecode1_play_idx:
+        if curr_idx < 0:
+            return timecode2_plays
+        if 'about' in timecode1_plays[curr_idx] and timecode1_plays[curr_idx]['about']['isComplete']:
+            last_complete_timecode1_play_idx = curr_idx
+        else:
+            curr_idx -= 1
+
     diff_plays = []
     for play in timecode2_plays[::-1]:
-        if play['about']['startTime'] == timecode1_plays[-1]['about']['startTime']:
+        if play['about']['startTime'] == timecode1_plays[last_complete_timecode1_play_idx]['about']['startTime']:
             return diff_plays
         else:
             diff_plays.append(play)
