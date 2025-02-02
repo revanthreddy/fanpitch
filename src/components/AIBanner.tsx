@@ -25,7 +25,7 @@ const LANGUAGES: Language[] = [
   },
 ];
 
-const AIBanner = ({ text, sender, videoUrls = [] }: ChatMessage) => {
+const AIBanner = ({ text, videoUrls = [] }: ChatMessage) => {
   const [translatedText, setTranslatedText] = useState<string | null>(null);
   const [isTranslating, setIsTranslating] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -94,7 +94,7 @@ const AIBanner = ({ text, sender, videoUrls = [] }: ChatMessage) => {
                 </div>
                 <div className="text-xs text-gray-500">
                   <RiGeminiLine className="inline-block mr-1" />
-                  powered by Google
+                  powered by Google Cloud
                 </div>
               </div>
               <div className="text-chat-ai-text whitespace-pre-wrap font-medium">
@@ -125,7 +125,7 @@ const AIBanner = ({ text, sender, videoUrls = [] }: ChatMessage) => {
                 </div>
                 <div className="text-xs text-gray-500">
                   <RiGeminiLine className="inline-block mr-1" />
-                  powered by Google
+                  powered by Google Cloud
                 </div>
               </div>
               <div className="text-chat-ai-text whitespace-pre-wrap font-medium">
