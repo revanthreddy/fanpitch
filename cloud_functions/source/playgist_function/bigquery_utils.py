@@ -1,5 +1,4 @@
 from google.cloud import bigquery
-import json
 
 from config import HOMERUN_DATASET_PATH
 
