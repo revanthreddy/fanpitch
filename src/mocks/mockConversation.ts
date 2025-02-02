@@ -18,10 +18,28 @@ export const mockConversation: Conversation = {
   ],
   messages: [
     {
+      id: 'pre1',
+      text: 'Hey everyone! Just finished setting my fantasy lineup for tomorrow. Had to bench Verlander... tough call 😕',
+      sender: { id: 'user2', name: 'Sarah', avatar: '⚾' },
+      timestamp: baseTime, // 23:23:37
+    },
+    {
+      id: 'pre2',
+      text: "I feel you Sarah. I've got three pitchers on the IL right now. This season has been rough!",
+      sender: { id: 'user5', name: 'Emma', avatar: '📊' },
+      timestamp: baseTime + 5000, // 23:23:50
+    },
+    {
+      id: 'pre3',
+      text: "Anyone want to make a trade? I'm looking to upgrade my outfield situation",
+      sender: { id: 'user1', name: 'Mike', avatar: '🎯' },
+      timestamp: baseTime + 11000, // 23:24:07
+    },
+    {
       id: '1',
       text: "Here comes Chris Taylor! Let's see if he can keep the inning alive.",
       sender: { id: 'user3', name: 'John', avatar: '🏆' },
-      timestamp: baseTime, // 23:24:22
+      timestamp: baseTime + 15000, // 23:24:22
     },
     {
       id: '2',
