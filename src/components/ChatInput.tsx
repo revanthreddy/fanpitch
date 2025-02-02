@@ -66,7 +66,7 @@ const ChatInput = ({
             onClick={() => handleSubmit(false)}
             disabled={disabled || !text.trim()}
             className="flex-shrink-0 w-11 h-11 rounded-full bg-primary disabled:bg-gray-300 text-white hover:brightness-125 hover:disabled:brightness-100 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:focus:ring-gray-300"
-            title="Send message">
+            title="Chat with the others">
             <svg
               className="w-5 h-5"
               viewBox="0 0 24 24"
@@ -83,7 +83,7 @@ const ChatInput = ({
               onClick={() => handleSubmit(true)}
               disabled={disabled || !text.trim()}
               className="flex-shrink-0 w-11 h-11 rounded-full bg-secondary disabled:bg-gray-300 text-white flex items-center justify-center hover:brightness-125 hover:disabled:brightness-100 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:focus:ring-gray-300"
-              title="Send message and get AI response">
+              title="Pitch your messageto AI">
               <PiBaseballDuotone className="w-6 h-6" />
             </button>
           )}

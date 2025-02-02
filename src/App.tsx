@@ -44,7 +44,6 @@ function App() {
 
   const handleMLBUpdate = useCallback(async (mlbData: MLBGameResponse) => {
     try {
-      console.log('Current messages length:', messagesRef.current.length);
       const response: MLBForwardingResponse =
         await mlbDataForwarder.current.forwardData(mlbData, {
           ...mockConversation,
@@ -170,7 +169,7 @@ function App() {
         <div className="sm:w-3/4 max-w-container mx-auto">
           <h1 className="text-white text-xl font-medium flex items-center gap-2">
             <PiBaseballHelmetDuotone className="w-6 h-6" />
-            MLB Fantasy League Chat
+            Big Leagues Chat
           </h1>
         </div>
       </header>
