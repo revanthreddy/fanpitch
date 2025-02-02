@@ -32,7 +32,7 @@ const ChatMessage = ({
         !isSequential && 'mt-4',
       )}>
       {!sender.isUser && !isSequential && (
-        <div className="w-10 h-10 rounded-full bg-primary-light text-white flex items-center justify-center text-sm font-medium mr-2 flex-shrink-0 shadow-avatar">
+        <div className="w-10 h-10 rounded-full bg-gray-50 text-white flex items-center justify-center text-md font-medium mr-2 flex-shrink-0 shadow-avatar">
           {sender.avatar || 'G'}
         </div>
       )}
@@ -61,7 +61,7 @@ const ChatMessage = ({
         <div className="whitespace-pre-wrap">{text}</div>
       </div>
       {sender.isUser && !isSequential && (
-        <div className="w-10 h-10 rounded-full bg-primary-light text-white flex items-center justify-center text-sm font-medium ml-2 flex-shrink-0 shadow-avatar">
+        <div className="w-10 h-10 rounded-full bg-blue-50 text-white flex items-center justify-center text-md font-medium ml-2 flex-shrink-0 shadow-avatar">
           {sender?.avatar || 'U'}
         </div>
       )}

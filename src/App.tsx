@@ -166,7 +166,7 @@ function App() {
   return (
     <div className="flex flex-col h-screen bg-gray-100 font-sans antialiased bg-[url('/baseballs.jpg')] bg-contain">
       <header className="backdrop-blur-md bg-primary/75 py-4 shadow-md">
-        <div className="sm:w-3/4 max-w-container mx-auto">
+        <div className="px-6 sm:w-3/4 mx-auto">
           <h1 className="text-white text-xl font-medium flex items-center gap-2">
             <PiBaseballHelmetDuotone className="w-6 h-6" />
             Big Leagues Chat

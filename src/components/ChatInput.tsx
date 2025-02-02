@@ -50,7 +50,7 @@ const ChatInput = ({
 
   return (
     <div className="border-t border-gray-200 bg-white px-4 py-3">
-      <div className="relative flex items-end gap-2 max-w-container mx-auto">
+      <div className="relative flex items-end gap-2 mx-auto">
         <textarea
           ref={textareaRef}
           value={text}
