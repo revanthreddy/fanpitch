@@ -2,7 +2,7 @@ from vertex_ai_utils import summarize_player_homerun_insights
 from vertex_ai_utils import translate_text
 from vertex_ai_utils import get_me_something_interesting
 from vertex_ai_utils import build_query_for_the_ask
-from vertex_ai_utils import summarize_ask_query_results
+# from vertex_ai_utils import summarize_ask_query_results
 from mlb_api_utils import plays, top_performers, plays_diff
 from config import GAME_PK
 import bigquery_utils
@@ -63,34 +63,34 @@ import bigquery_utils
 # print(get_me_something_interesting(conversation=conversation))
 
 
-print(summarize_ask_query_results("tell  me about  top 5, 100 yards homers"))
+# print(summarize_ask_query_results("tell  me about  top 5, 100 yards homers"))
 
 # print(summarize_ask_query_results("how many home runs did Jesús Sánchez hit?"))
 
-# start = "20240919_214811"
-# end = "20240919_234610"
-#
-# # print(plays_diff(gamePk=GAME_PK, timecode1=start , timecode2="20240919_223320"))
-#
-#
-# conversation = {
-#     "chat": [
-#         {
-#             "id": "1",
-#             "text": "Here comes Muncy! Let's see if he can keep the inning alive.",
-#             "sender": {
-#                 "id": "user3",
-#                 "name": "John",
-#                 "avatar": "🏆"
-#             },
-#             "timestamp": 1726786342211
-#         }
-#     ],
-#     "start": start,
-#     "end": end
-# }
-#
-# print(get_me_something_interesting(conversation))
+start = "20240919_204720"
+end = "20240919_223530"
+
+# print(plays_diff(gamePk=GAME_PK, timecode1=start , timecode2="20240919_223320"))
+
+
+conversation = {
+    "chat": [
+        {
+            "id": "1",
+            "text": "Here comes Muncy! Let's see if he can keep the inning alive.",
+            "sender": {
+                "id": "user3",
+                "name": "John",
+                "avatar": "🏆"
+            },
+            "timestamp": 1726786342211
+        }
+    ],
+    "start": start,
+    "end": end
+}
+
+print(get_me_something_interesting(conversation))
 
 
 # bigquery_utils.videos_urls_for_plays([])
