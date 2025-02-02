@@ -7,7 +7,9 @@ const MLB_FORWARDING_ENDPOINT =
 
 export interface MLBForwardingResponse {
   summary: string;
-  clip: string;
+  videos: {
+    video: string;
+  }[];
 }
 
 export class MLBDataForwarder {

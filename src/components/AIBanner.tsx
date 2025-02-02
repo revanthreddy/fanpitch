@@ -23,7 +23,7 @@ const LANGUAGES: Language[] = [
   },
 ];
 
-const AIBanner = ({ text, sender, videoUrl }: ChatMessage) => {
+const AIBanner = ({ text, sender, videoUrls = [] }: ChatMessage) => {
   const [translatedText, setTranslatedText] = useState<string | null>(null);
   const [isTranslating, setIsTranslating] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -93,14 +93,14 @@ const AIBanner = ({ text, sender, videoUrl }: ChatMessage) => {
               <div className="text-chat-ai-text whitespace-pre-wrap font-medium">
                 {text}
               </div>
-              {videoUrl && (
+              {videoUrls.map((url) => (
                 <div className="mt-4 rounded-lg overflow-hidden bg-black aspect-video">
                   <video controls className="w-full h-full" playsInline>
-                    <source src={videoUrl} type="video/mp4" />
+                    <source src={url} type="video/mp4" />
                     Your browser does not support the video tag.
                   </video>
                 </div>
-              )}
+              ))}
             </div>
           </div>
 
@@ -119,14 +119,14 @@ const AIBanner = ({ text, sender, videoUrl }: ChatMessage) => {
               <div className="text-chat-ai-text whitespace-pre-wrap font-medium">
                 {translatedText}
               </div>
-              {videoUrl && (
+              {videoUrls.map((url) => (
                 <div className="mt-4 rounded-lg overflow-hidden bg-black aspect-video">
                   <video controls className="w-full h-full" playsInline>
-                    <source src={videoUrl} type="video/mp4" />
+                    <source src={url} type="video/mp4" />
                     Your browser does not support the video tag.
                   </video>
                 </div>
-              )}
+              ))}
             </div>
           </div>
         </div>

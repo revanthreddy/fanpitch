@@ -57,7 +57,7 @@ function App() {
       const newMessage: ChatMessageType = {
         id: Math.random().toString(),
         text: response.summary,
-        videoUrl: response.clip,
+        videoUrls: response.videos?.map((videoObj) => videoObj.video),
         timestamp: getMockTime(),
         sender: BOT_SENDER,
       };
@@ -120,7 +120,7 @@ function App() {
       const newMessage: ChatMessageType = {
         id: Math.random().toString(),
         text: data.summary,
-        videoUrl: data.clip,
+        videoUrls: data.clip ? [data.clip] : [],
         timestamp: getMockTime(),
         sender: BOT_SENDER,
       };
