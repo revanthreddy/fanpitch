@@ -147,7 +147,7 @@ const AIBanner = ({ text, sender, videoUrls = [] }: ChatMessage) => {
                 )}
               </button>
               {isDropdownOpen && !isTranslating && (
-                <div className="absolute top-0 bg-white rounded-md shadow-lg border border-gray-200 py-1 z-50 transform transition-all duration-200 origin-left">
+                <div className="absolute top-0 right-0 sm:right-auto bg-white rounded-md shadow-lg border border-gray-200 py-1 z-50 transform transition-all duration-200 origin-left">
                   {LANGUAGES.map((lang) => (
                     <button
                       key={lang.code}

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, KeyboardEvent } from 'react';
+import { PiBaseballDuotone } from 'react-icons/pi';
 
 interface ChatInputProps {
   onSubmit: (text: string) => void;
@@ -83,21 +84,12 @@ const ChatInput = ({
               disabled={disabled || !text.trim()}
               className="flex-shrink-0 w-11 h-11 rounded-full bg-secondary disabled:bg-gray-300 text-white flex items-center justify-center hover:brightness-125 hover:disabled:brightness-100 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:focus:ring-gray-300"
               title="Send message and get AI response">
-              <svg
-                className="w-5 h-5"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-14v8l6-4z"
-                  fill="currentColor"
-                />
-              </svg>
+              <PiBaseballDuotone className="w-6 h-6" />
             </button>
           )}
         </div>
       </div>
-      <div className="text-xs text-gray-500 mt-1 px-3">
+      <div className="hidden sm:block text-xs text-gray-500 mt-1 px-3">
         Press Enter to send, Shift+Enter to send with AI response
       </div>
     </div>
