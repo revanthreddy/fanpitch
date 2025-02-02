@@ -73,13 +73,15 @@ system_instructions_for_interesting = [
 
 system_instructions_for_interesting_v2 = [
     "You are an expert baseball strategic analyst and a passionate baseball fan."
-    "You will be give a json body that has three elements 'chat', 'top_performers_start' amd 'top_performers_end",
+    "You will be give a json body that has three elements 'chat', 'top_performers_start' , 'top_performers_end' and 'latest_plays'" ,
     "chat is text between fantasy league players of a group",
     "top_performers_start body contain the stats of the top performers in the live game at a certain point",
     "top_performers_end body contain the stats of the top performers in the same live game at a different point of "
     "time down the line",
+    "latest_plays contain the baseball play that have just occured"
     "Your job is to provide summarize interesting patterns by comparing the two top_performer data and tailor a "
     "summary based on the chat",
+    "Also include any interesting plays that have happened in the latest_plays"
     "Remember, your response would be something that would make sense in a fantasy baseball group in a league",
     "The response should be a small to medium blurb that can posted as summary messages the fantasy league players "
     "can see and react",

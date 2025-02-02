@@ -89,10 +89,12 @@ def summarize_player_homerun_insights(player):
 
 
 def get_me_something_interesting(conversation):
+    diff_plays = plays_diff(GAME_PK, conversation["start"], conversation['end'])
     input_data = {
         "chat": conversation["chat"],
         "top_performers_start_window": top_performers(GAME_PK, timecode=conversation["start"]),
-        "top_performers_end_window": top_performers(GAME_PK, timecode=conversation["end"])
+        "top_performers_end_window": top_performers(GAME_PK, timecode=conversation["end"]),
+        "latest_plays": diff_plays
     }
     model = create_model(config.system_instructions_for_interesting_v2)
     generation_config = get_generation_config(temperature=2, response_schema={
