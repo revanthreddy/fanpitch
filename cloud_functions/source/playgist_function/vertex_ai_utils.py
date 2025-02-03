@@ -4,7 +4,7 @@ from vertexai.preview.generative_models import GenerativeModel, GenerationConfig
 from vertexai.preview import generative_models
 from config import PROJECT_ID, LOCATION, MODEL_NAME, GAME_PK
 from bigquery_utils import run_query, run_query_v2
-from mlb_api_utils import plays, top_performers, plays_diff
+from mlb_api_utils import top_performers, plays_diff
 import config
 
 vertexai.init(project=PROJECT_ID, location=LOCATION)
@@ -88,13 +88,12 @@ def summarize_player_homerun_insights(player):
         return {"response": str(e)}, 500
 
 
-def get_me_something_interesting(conversation):
-    diff_plays = plays_diff(GAME_PK, conversation["start"], conversation['end'])
+def get_me_something_interesting(conversation, diff_plays=None):
     input_data = {
         "chat": conversation["chat"],
         "top_performers_start_window": top_performers(GAME_PK, timecode=conversation["start"]),
         "top_performers_end_window": top_performers(GAME_PK, timecode=conversation["end"]),
-        "latest_plays": diff_plays
+        "latest_plays": diff_plays if diff_plays else plays_diff(GAME_PK, conversation["start"], conversation['end'])
     }
     model = create_model(config.system_instructions_for_interesting_v2)
     generation_config = get_generation_config(temperature=2, response_schema={

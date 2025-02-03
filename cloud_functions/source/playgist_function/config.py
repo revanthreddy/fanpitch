@@ -78,7 +78,7 @@ system_instructions_for_interesting_v2 = [
     "top_performers_start body contain the stats of the top performers in the live game at a certain point",
     "top_performers_end body contain the stats of the top performers in the same live game at a different point of "
     "time down the line",
-    "latest_plays contain the baseball play that have just occured"
+    "latest_plays contain the baseball play that have just occurred"
     "Your job is to provide summarize interesting patterns by comparing the two top_performer data and tailor a "
     "summary based on the chat",
     "Also include any interesting plays that have happened in the latest_plays"

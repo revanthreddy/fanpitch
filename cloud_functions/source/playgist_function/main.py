@@ -1,12 +1,10 @@
 import functions_framework
 from flask import make_response, jsonify
-from flask_cors import CORS, cross_origin
 
 from bigquery_utils import videos_urls_for_plays
 from vertex_ai_utils import summarize_player_homerun_insights
 from vertex_ai_utils import translate_text
 from vertex_ai_utils import get_me_something_interesting
-from vertex_ai_utils import build_query_for_the_ask
 from vertex_ai_utils import summarize_ask_query_results
 from urllib.parse import unquote
 from config import ALLOWED_LANGUAGES, GAME_PK
@@ -70,8 +68,7 @@ def handler(request):
         # Use in get_me_something_interesting. Saves an extra network call
         diff_plays = plays_diff(GAME_PK, request_json['start'], request_json['end'])
 
-        response, status = get_me_something_interesting(request_json)
-        # response, status = {"summary" : "Interesting details coming sooon !!!!"}, 200
+        response, status = get_me_something_interesting(request_json, diff_plays)
 
         video_urls = videos_urls_for_plays(diff_plays)
         if len(video_urls) > 0:
