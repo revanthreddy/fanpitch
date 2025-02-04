@@ -21,7 +21,7 @@ We're passionate fantasy baseball players who've always felt frustrated by the l
 ## Features
 FanPitch is an AI-powered assistant integrated directly into your fantasy league's group chat. It dynamically analyzes conversations, offering:
 
-* **Real-time insights:** Instant access to relevant stats, news, and highlight clips based on players mentioned in the chat.
+* **Real-time insights:** Instant access to relevant stats, news, and highlight clips based on players mentioned in the chat and the events from the live game.
 * **Multilingual message translation support:** Break down language barriers within your league with seamless real-time translation.
 * **Pitch a question:** Gain insights into baseball stats by asking FanPitch questions relevant to the game
 
@@ -34,7 +34,7 @@ FanPitch leverages a combination of technologies:
 
 ## Technologies
 
-* **Vertex AI (featuring Gemini models):**  Powers the natural language understanding and response generation.
+* **[Vertex AI (featuring Gemini models)](https://cloud.google.com/vertex-ai?hl=en#build-with-gemini):**  Powers the natural language understanding and response generation.
 * **[API GW](https://cloud.google.com/api-gateway/docs/about-api-gateway) and [Cloud Run functions](https://cloud.google.com/functions#key-features):**  Powers the backend by handling API requests and executing the natural language understanding and response generation logic.
 * **[BigQuery](https://cloud.google.com/bigquery?hl=en):** Stores and manages our baseball datasets.
 * **[Firebase](https://firebase.google.com):** UI hosting.
@@ -61,20 +61,22 @@ FanPitch leverages a combination of technologies:
 
 ## Usage
 
-The application is available at https://ethereal-temple-448819-n0.web.app. The application currently loads a live simulation of a fantasy league chat running on a particular game at a particular time. 
-It simulates user interaction but makes calls to the backend to generate contextually aware real-time responses. We support translation and pitch-a-question via Shift+enter. 
-The responses to pitch-a-question are limited to homerun data from the 2024 season. 
-For example, you can try the below prompts: 
-- "Can you show me a clip of the fastest home run in 2024?"
-- "What was the longest homer this year?"
-- "Give me the 5 longest home runs"
-- "Give me the top 5 home runs where the exit velocity was less than 100 mph, but the distance was more than 200"
-- 
+- The application is available at https://ethereal-temple-448819-n0.web.app. 
+- The application currently loads a live simulation of a fantasy league chat running on a particular game at a particular time. It simulates user interaction but makes calls to the backend to generate contextually aware real-time responses. We support translation and pitch-a-question via Shift+enter. 
+- The responses to pitch-a-question are limited to homerun data from the 2024 season. 
+  - For example, you can try the below prompts: 
+    - `Can you show me a clip of the fastest home run in 2024?`
+    - `What was the longest homer this year?`
+    - `Give me the 5 longest home runs`
+    - `Give me the top 5 home runs where the exit velocity was less than 100 mph, but the distance was more than 200`
+
 ## Future Roadmap
 * **Catch Me Up:** This feature would summarize the last few minutes of the conversation while the user was in an idle state or away from the chat.
 * **Audio Podcast Generation:** The one feature on our roadmap that we are excited about is the ability to generate audio podcasts of chat logs. We envision this as a way for users to relive the excitement of close games, or hilarious banter.
 * **Data Enrichment:** We recognize that the quality of FanPitch's insights is directly tied to the data that is being used. Therefore, we plan to incorporate more diverse and granular baseball statistics, player information, and even external data sources (like news articles, expert predictions, or live commentary) to empower our application and enhance the responses.
-* **Improved Model Training:**  Continuously refine and retrain our AI models to optimize performance and accuracy.
+* **Improve Insights and AI model evolution:** The quality of FanPitch's insights is directly tied to the data that is being used. We want to enrich our data with diverse sources (baseball statistics, player information, and external data like news and expert predictions) and evolve our AI models through prompt engineering (including system instructions), and retraining.
+
+.
 
 ## Team
 
