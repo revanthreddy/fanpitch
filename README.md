@@ -7,6 +7,7 @@ Supercharge your fantasy league with FanPitch! This AI assistant analyzes live g
 
 * [Introduction](#introduction)
 * [Features](#features)
+* [How we built it](#how-we-built-each-feature)
 * [Technologies](#technologies)
 * [Installation](#installation)
 * [Usage](#usage)
@@ -17,7 +18,7 @@ Supercharge your fantasy league with FanPitch! This AI assistant analyzes live g
 
 We're passionate fantasy baseball players who've always felt frustrated by the limitations of chats provided by traditional fantasy leagues. Scattered stats, endless scrolling, and the difficulty of incorporating diverse perspectives hampered the fun and engagement. We envisioned a tool that could centralize, analyze, and enhance the entire fantasy experience for the user without ever leaving the chat.
 
-## What it does
+## Features
 FanPitch is an AI-powered assistant integrated directly into your fantasy league's group chat. It dynamically analyzes conversations, offering:
 
 * **Real-time insights:** Instant access to relevant stats, news, and highlight clips based on players mentioned in the chat.
