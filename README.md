@@ -29,7 +29,7 @@ FanPitch is an AI-powered assistant integrated directly into your fantasy league
 FanPitch leverages a combination of technologies:
 
 - Real-time Insights: We take user chats and live game events via the MLB stats API to generate relevant conversational highlights and analysis as the game progresses. We also summarize user interactions and callout chat participation. Currently the application has access to the [2024 MLB home runs dataset](https://storage.googleapis.com/gcp-mlb-hackathon-2025/datasets/2024-mlb-homeruns.csv) and the MLB stats API.
-- Pitch a question: The user's natural language input is sent to a custom-trained AI model hosted on Vertex AI. This model intelligently interprets the question and translates it into a structured query suitable for BigQuery. This is the core of our solution, allowing users to access complex data without needing to know SQL or understand database schemas. An AI model uses this data to craft a clear, concise, and contextually aware response.
+- Pitch a question: The user's natural language input is sent to a Gemini model on Vertex AI.  Through prompt engineering, the model intelligently interprets the question and translates it into a structured query suitable for BigQuery. This is the core of our solution, allowing users to access complex data without needing to know SQL or understand database schemas. The Gemini model uses this data to craft a clear, concise, and contextually aware response.
 - Chat Integration: The AI-generated response is delivered directly back into the fantasy league chat, providing users with instant insights without ever leaving the conversation. This creates a truly integrated and streamlined experience.
 
 ## Technologies
